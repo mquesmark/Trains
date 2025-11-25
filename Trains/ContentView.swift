@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Trains
-//
-//  Created by Максим on 11/25/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
