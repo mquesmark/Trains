@@ -4,7 +4,7 @@ info:
   description: API Яндекс.Расписаний
   version: 3.0.0
 servers:
-- url: https://api.rasp.yandex.net
+- url: https://api.rasp.yandex-net.ru
 tags:
 - name: Список ближайших станций
   description: Список ближайших станций
@@ -86,9 +86,9 @@ paths:
   /v3.0/search/:
     get:
       tags:
-        - getSchedualBetweenStations
+        - getScheduleBetweenStations
       summary: Расписание рейсов между станциями
-      operationId: getSchedualBetweenStations
+      operationId: getScheduleBetweenStations
       parameters:
         - name: apikey
           in: query
