@@ -422,7 +422,7 @@ paths:
         "200":
           description: Успешный ответ
           content:
-            text/html; charset=utf-8:
+            text/html:
               schema:
                 $ref: '#/components/schemas/AllStationsResponse'
   /v3.0/copyright/:
@@ -491,11 +491,9 @@ components:
                     description: Периодичность рейсов, например, "автобус раз в 10-15 минут".
                   begin_time:
                     type: string
-                    format: date-time
                     description: Время начала движения по нитке.
                   end_time:
                     type: string
-                    format: date-time
                     description: Время окончания движения по нитке.
               duration:
                 type: integer
@@ -745,10 +743,8 @@ components:
       properties:
         arrival:
           type: string
-          format: date-time
         departure:
           type: string
-          format: date-time
         stop_time:
           type: integer
           description: Продолжительность остановки в секундах
@@ -792,11 +788,9 @@ components:
               description: Частота рейсов
             begin_time:
               type: string
-              format: date-time
               description: Время начала
             end_time:
               type: string
-              format: date-time
               description: Время окончания
     Directions:
       type: object
@@ -839,11 +833,9 @@ components:
           description: Периодичность рейсов
         begin_time:
           type: string
-          format: date-time
           description: Время начала рейсов
         end_time:
           type: string
-          format: date-time
           description: Время окончания рейсов
     ThreadStationsResponse:
       type: object
