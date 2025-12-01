@@ -13,6 +13,7 @@ protocol StationsListServiceProtocol {
 final class StationsListService: StationsListServiceProtocol {
     private let client: Client
     private let apikey: String
+    private let decoder = JSONDecoder()
 
     init(apikey: String, client: Client) {
         self.apikey = apikey
@@ -26,7 +27,7 @@ final class StationsListService: StationsListServiceProtocol {
         let limit = 50 * 1024 * 1024 // 50Mb
         let fullData = try await Data(collecting: responseBody, upTo: limit)
 
-        let allStations = try JSONDecoder().decode(AllStationsResponse.self, from: fullData)
+        let allStations = try decoder.decode(AllStationsResponse.self, from: fullData)
 
         return allStations
     }
