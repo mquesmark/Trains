@@ -42,6 +42,18 @@ struct CarriersResultsView: View {
                         showTransfers: $showTransfers
                     )
                     .toolbar(.hidden, for: .tabBar)
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                path.removeLast()
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 18, weight: .semibold))
+                            }
+                            .foregroundStyle(Color(.label))
+                        }
+                    }
                 } label: {
                     HStack(spacing: 4) {
                         Text("Уточнить время")

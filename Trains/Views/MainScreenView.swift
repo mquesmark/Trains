@@ -63,6 +63,18 @@ struct MainScreenView: View {
                 case .cities(let target):
                     CitySelectionView(target: target, path: $path)
                         .toolbar(.hidden, for: .tabBar)
+                        .navigationBarBackButtonHidden(true)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button {
+                                    path.removeLast()
+                                } label: {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 18, weight: .semibold))
+                                }
+                                .foregroundStyle(Color(.label))
+                            }
+                        }
                 case .stations(let target, let city):
                     StationSelectionView(
                         target: target,
@@ -74,10 +86,34 @@ struct MainScreenView: View {
                         toStation: $toStation
                     )
                     .toolbar(.hidden, for: .tabBar)
+                    .navigationBarBackButtonHidden(true)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                path.removeLast()
+                            } label: {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 18, weight: .semibold))
+                            }
+                            .foregroundStyle(Color(.label))
+                        }
+                    }
 
                 case .results(let routeString):
                     CarriersResultsView(routeString: routeString, path: $path)
                         .toolbar(.hidden, for: .tabBar)
+                        .navigationBarBackButtonHidden(true)
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button {
+                                    path.removeLast()
+                                } label: {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 18, weight: .semibold))
+                                }
+                                .foregroundStyle(Color(.label))
+                            }
+                        }
                 }
 
             }
