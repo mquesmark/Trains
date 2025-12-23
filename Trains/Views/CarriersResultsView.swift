@@ -10,7 +10,7 @@ struct CarriersResultsView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 16) {
                 Text(routeString)
                     .font(.system(size: 24, weight: .bold))
                     .padding(.horizontal, 16)
@@ -43,15 +43,23 @@ struct CarriersResultsView: View {
                     )
                     .toolbar(.hidden, for: .tabBar)
                 } label: {
-                    Text("Уточнить время")
-                        .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 60)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.blueUniversal)
-                        )
-                        .contentShape(RoundedRectangle(cornerRadius: 16))
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(Color.white)
+                    HStack(spacing: 4) {
+                        Text("Уточнить время")
+
+                        if !timeSelection.isEmpty {
+                            Circle()
+                                .fill(Color.redUniversal)
+                                .frame(width: 8, height: 8)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 60, maxHeight: 60)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.blueUniversal)
+                    )
+                    .contentShape(RoundedRectangle(cornerRadius: 16))
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(Color.white)
                 }
                 .buttonStyle(.plain)
                 .padding(.horizontal, 16)
