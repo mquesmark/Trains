@@ -1,41 +1,95 @@
 import SwiftUI
 
+enum PickTarget: Hashable {
+    case from
+    case to
+}
+
+enum Route: Hashable {
+    case cities(PickTarget)
+    case stations(PickTarget, city: String)
+    case results(routeString: String)
+}
+
 struct MainScreenView: View {
-    @State var canSearch: Bool = true
+
+    var canSearch: Bool {
+        fromCity != nil && fromStation != nil && toCity != nil && toStation != nil
+    }
+    var routeString: String {
+        "\(fromCity!) (\(fromStation!)) → \(toCity!) (\(toStation!))"
+    }
     
+    @State private var path: [Route] = []
+    @State private var fromCity: String? = nil
+    @State private var fromStation: String? = nil
+    @State private var toCity: String? = nil
+    @State private var toStation: String? = nil
+
     var body: some View {
-        VStack {
-            DirectionView()
+        NavigationStack(path: $path) {
+            VStack {
+                DirectionView(
+                    fromCity: $fromCity,
+                    fromStation: $fromStation,
+                    toCity: $toCity,
+                    toStation: $toStation,
+                    onFromTap: { path.append(.cities(.from)) },
+                    onToTap: { path.append(.cities(.to)) }
+                )
                 .padding(.init(top: 20, leading: 16, bottom: 16, trailing: 16))
-            
-            if canSearch {
-                Button("Найти") {
-                    searchTapped()
+
+                if canSearch {
+                    Button {
+                        searchTapped()
+                    } label: {
+                        Text("Найти")
+                            .frame(width: 150, height: 60)
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundStyle(.white)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.blueUniversal)
+                            )
+                            .contentShape(RoundedRectangle(cornerRadius: 16))
+                    }
+                    .buttonStyle(.plain)
                 }
-                    .frame(width: 150, height: 60)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color.blueUniversal)
-                    )
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(.white)
-            }
                 Spacer()
+            }
+            .background(.backgroundYP)
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .cities(let target):
+                    CitySelectionView(target: target, path: $path)
+                        .toolbar(.hidden, for: .tabBar)
+                case .stations(let target, let city):
+                    StationSelectionView(
+                        target: target,
+                        city: city,
+                        path: $path,
+                        fromCity: $fromCity,
+                        fromStation: $fromStation,
+                        toCity: $toCity,
+                        toStation: $toStation
+                    )
+                    .toolbar(.hidden, for: .tabBar)
+
+                case .results(let routeString):
+                    CarriersResultsView(routeString: routeString, path: $path)
+                        .toolbar(.hidden, for: .tabBar)
+                }
+
+            }
         }
-        .background(.backgroundYP)
     }
-    
+
     private func searchTapped() {
-        
+        path.append(.results(routeString: routeString))
     }
 }
 
 #Preview {
     MainScreenView()
 
-}
-
-#Preview {
-    MainScreenView()
-        .preferredColorScheme(.dark)
 }

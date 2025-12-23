@@ -1,32 +1,58 @@
 import SwiftUI
 
 struct DirectionView: View {
-    @State var fromText: String? = nil
-    @State var toText: String? = nil
+    @Binding var fromCity: String?
+    @Binding var fromStation: String?
+    @Binding var toCity: String?
+    @Binding var toStation: String?
+
+    var fromText: String? {
+        guard let city = fromCity, let station = fromStation else {
+            return nil
+        }
+        return "\(city) (\(station))"
+    }
+    var toText: String? {
+        guard let city = toCity, let station = toStation else {
+            return nil
+        }
+        return "\(city) (\(station))"
+    }
+
     let fromPlaceholder = "Откуда"
     let toPlaceholder = "Куда"
-    
+    let onFromTap: () -> Void
+    let onToTap: () -> Void
+
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.blueUniversal)
             HStack {
-                VStack(alignment: .leading, spacing: 0) {
-                    
+                VStack(spacing: 8) {
                     Text(fromText ?? fromPlaceholder)
-                        .font(.system(size: 17, weight: .regular))
-                        .foregroundStyle(fromText == nil ? .grayUniversal : .black)
+                        .foregroundStyle(
+                            fromText == nil ? .grayUniversal : .black
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(16)
-                    
+                        .contentShape(Rectangle())
+                        .onTapGesture { onFromTap() }
+
                     Text(toText ?? toPlaceholder)
-                        .font(.system(size: 17, weight: .regular))
-                        .foregroundStyle(toText == nil ? .grayUniversal : .black)
+                        .foregroundStyle(
+                            toText == nil ? .grayUniversal : .black
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(16)
-                    
+                        .contentShape(Rectangle())
+                        .onTapGesture { onToTap() }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.white)
-                .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                .clipShape(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                )
                 .padding(16)
                 Button {
                     switchButtonTapped()
@@ -39,14 +65,33 @@ struct DirectionView: View {
         .frame(maxWidth: .infinity)
         .frame(height: 120)
     }
-    
+
     private func switchButtonTapped() {
-        let temp = fromText
-        fromText = toText
-        toText = temp
+        swap(&fromCity, &toCity)
+        swap(&fromStation, &toStation)
     }
 }
 
 #Preview {
-    DirectionView()
+    struct PreviewWrapper: View {
+        @State private var fromCity: String? = "Москва"
+        @State private var fromStation: String? = "Ленинградский"
+        @State private var toCity: String? = "Санкт-Петербург"
+        @State private var toStation: String? = "Московский"
+
+        var body: some View {
+            DirectionView(
+                fromCity: $fromCity,
+                fromStation: $fromStation,
+                toCity: $toCity,
+                toStation: $toStation,
+                onFromTap: {},
+                onToTap: {}
+            )
+            .padding()
+            .background(Color(.systemGroupedBackground))
+        }
+    }
+
+    return PreviewWrapper()
 }

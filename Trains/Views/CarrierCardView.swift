@@ -7,7 +7,7 @@ struct CarrierCardView: View {
     var body: some View {
         VStack(spacing: 18) {
             HStack(alignment: .top) {
-                Image(.railwaysMock)
+                Image(carrier.logo)
                     .frame(width: 38, height: 38)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(carrier.name)

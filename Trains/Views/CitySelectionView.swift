@@ -1,11 +1,10 @@
 import SwiftUI
 
 struct CitySelectionView: View {
-    let cities: [String] = [
-        "Москва", "Санкт-Петербург", "Новосибирск", "Казань",
-        "Омск", "Томск", "Челябинск", "Иркутск",
-        "Ярославль", "Нижний Новгород"
-    ]
+    let target: PickTarget
+    @Binding var path: [Route]
+    
+    let cities: [String] = Mocks.citiesStrings
     
     @State private var searchText = ""
     var filteredCities: [String] {
@@ -35,6 +34,7 @@ struct CitySelectionView: View {
                             .foregroundColor(Color(.label))
                     }
                     .frame(height: 60)
+                    .contentShape(Rectangle())
                     .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.backgroundYP)
@@ -56,18 +56,12 @@ struct CitySelectionView: View {
     }
     
     private func didSelectCity(_ city: String) {
-        
+        path.append(.stations(target, city: city))
     }
 }
 
 #Preview {
-    NavigationStack() {
-        CitySelectionView()
-    }
-}
-#Preview {
-    NavigationStack() {
-        CitySelectionView()
-            .preferredColorScheme(.dark)
+    NavigationStack {
+        CitySelectionView(target: .from, path: .constant([]))
     }
 }

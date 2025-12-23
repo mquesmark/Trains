@@ -1,79 +1,133 @@
 final class Mocks {
+    static let citiesStrings =  [
+        "Москва", "Санкт-Петербург", "Новосибирск", "Казань",
+        "Омск", "Томск", "Челябинск", "Иркутск",
+        "Ярославль", "Нижний Новгород"
+    ]
+    static let stationsStrings = [
+        "Киевский вокзал",
+        "Курский вокзал",
+        "Ярославский вокзал",
+        "Белорусский вокзал",
+        "Савеловский вокзал",
+        "Ленинградский вокзал"
+    ]
+
+    static let moscowMockStations = [
+        "Киевский вокзал",
+        "Курский вокзал",
+        "Ярославский вокзал",
+        "Белорусский вокзал",
+        "Савеловский вокзал",
+        "Ленинградский вокзал"
+    ]
+
+    static let spbMockStations = [
+        "Московский вокзал",
+        "Ладожский вокзал",
+        "Финляндский вокзал",
+        "Балтийский вокзал",
+        "Витебский вокзал"
+    ]
+
+    static let novosibirskMockStations = [
+        "Новосибирск-Главный",
+        "Новосибирск-Южный",
+        "Новосибирск-Западный"
+    ]
+
+    static let kazanMockStations = [
+        "Казань-Пассажирская",
+        "Казань-2",
+        "Юдино"
+    ]
+
+    static let omskMockStations = [
+        "Омск-Пассажирский",
+        "Омск-Восточный"
+    ]
+
+    static let tomskMockStations = [
+        "Томск-1",
+        "Томск-2"
+    ]
+
+    static let chelyabinskMockStations = [
+        "Челябинск-Главный",
+        "Челябинск-Южный"
+    ]
+
+    static let irkutskMockStations = [
+        "Иркутск-Пассажирский",
+        "Иркутск-Сортировочный"
+    ]
+
+    static let yaroslavlMockStations = [
+        "Ярославль-Главный",
+        "Ярославль-Московский"
+    ]
+
+    static let nizhnyNovgorodMockStations = [
+        "Нижний Новгород-Московский",
+        "Сормово"
+    ]
+    
     static let mockCarrierCards: [CarrierCardModel] = [
         CarrierCardModel(
             date: "24 сентября",
             startTime: "22:30",
-            endTime: "08:15",
+            endTime: "18:30",
             routeTime: "20 часов",
             logo: "rzd",
             name: "РЖД",
-            warningText: "Отправление с задержкой"
+            warningText: "С пересадкой в Костроме"
+        ),
+        CarrierCardModel(
+            date: "24 сентября",
+            startTime: "01:15",
+            endTime: "10:15",
+            routeTime: "9 часов",
+            logo: "fgk",
+            name: "ФГК"
+        ),
+        CarrierCardModel(
+            date: "24 сентября",
+            startTime: "12:30",
+            endTime: "21:30",
+            routeTime: "9 часов",
+            logo: "ural",
+            name: "Урал логистика"
         ),
         CarrierCardModel(
             date: "25 сентября",
-            startTime: "06:40",
+            startTime: "06:20",
             endTime: "14:10",
-            routeTime: "7 часов",
+            routeTime: "8 часов",
             logo: "rzd",
             name: "РЖД"
         ),
         CarrierCardModel(
             date: "25 сентября",
-            startTime: "09:55",
-            endTime: "18:20",
-            routeTime: "8 часов",
-            logo: "sapsan",
-            name: "Сапсан"
+            startTime: "09:40",
+            endTime: "18:30",
+            routeTime: "9 часов",
+            logo: "fgk",
+            name: "ФГК",
+            warningText: "Возможна задержка"
         ),
         CarrierCardModel(
             date: "26 сентября",
-            startTime: "01:10",
-            endTime: "12:45",
+            startTime: "00:15",
+            endTime: "11:20",
             routeTime: "11 часов",
-            logo: "rzd",
-            name: "РЖД",
-            warningText: "Возможна замена состава"
+            logo: "ural",
+            name: "Урал логистика"
         ),
         CarrierCardModel(
             date: "26 сентября",
-            startTime: "15:00",
-            endTime: "23:30",
-            routeTime: "8 часов",
-            logo: "lastochka",
-            name: "Ласточка"
-        ),
-        CarrierCardModel(
-            date: "27 сентября",
-            startTime: "19:20",
-            endTime: "05:50",
-            routeTime: "10 часов",
-            logo: "rzd",
-            name: "РЖД",
-            warningText: "Ночной рейс"
-        ),
-        CarrierCardModel(
-            date: "27 сентября",
-            startTime: "19:20",
-            endTime: "05:50",
-            routeTime: "10 часов",
-            logo: "rzd",
-            name: "РЖД",
-            warningText: "Ночной рейс"
-        ),
-        CarrierCardModel(
-            date: "27 сентября",
-            startTime: "19:20",
-            endTime: "05:50",
-            routeTime: "10 часов",
-            logo: "rzd",
-            name: "РЖД",
-            warningText: "Ночной рейс"
-        ),
-        CarrierCardModel(
-            date: "27 сентября",
-            startTime: "19:20",
-            endTime: "05:50",
-            routeTime: "10 часов",
+            startTime: "17:10",
+            endTime: "03:40",
+            routeTime: "11 часов",
             logo: "rzd",
             name: "РЖД",
             warningText: "Ночной рейс"

@@ -17,9 +17,10 @@ enum TimeIntervals: CaseIterable {
 }
 
 struct FiltersView: View {
+    @Environment(\.dismiss) private var dismiss
     
-    @State var timeSelection: Set<TimeIntervals> = []
-    @State var showTransfers: Bool?
+    @Binding var timeSelection: Set<TimeIntervals>
+    @Binding var showTransfers: Bool?
     
     var body: some View {
         ZStack {
@@ -46,6 +47,7 @@ struct FiltersView: View {
                         toggleTimeSelection(interval)
                     }
                 }
+                .scrollDisabled(true)
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .background(Color.backgroundYP)
@@ -61,15 +63,20 @@ struct FiltersView: View {
                             Spacer()
                             Image((showTransfers ?? false) ? .circleSelected : .circle)
                         }
+                        .frame(height: 60)
+                        .listRowSeparator(.hidden)
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             showTransfers = true
                         }
                         HStack {
                             Text("Нет")
                             Spacer()
-                            Image( ((showTransfers != nil) && showTransfers == false) ? .circleSelected : .circle )
+                            Image(((showTransfers != nil) && showTransfers == false) ? .circleSelected : .circle)
                         }
+                        .frame(height: 60)
                         .listRowSeparator(.hidden)
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             showTransfers = false
                         }
@@ -77,6 +84,7 @@ struct FiltersView: View {
                     .listRowBackground(Color.backgroundYP)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
                 }
+                .scrollDisabled(true)
                 .listStyle(.plain)
                 .scrollContentBackground(.hidden)
                 .background(Color.backgroundYP)
@@ -84,15 +92,21 @@ struct FiltersView: View {
                 
                 Spacer()
                 
-                Button("Применить") {
+                Button {
                     applyTapped()
+                } label: {
+                    Text("Применить")
+                        .frame(height: 60)
+                        .frame(maxWidth: .infinity)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(Color.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.blueUniversal)
+                        )
+                        .contentShape(RoundedRectangle(cornerRadius: 16))
                 }
-                .frame(height: 60)
-                .frame(maxWidth: .infinity)
-                .background(RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.blueUniversal))
-                .foregroundStyle(Color.white)
-                .font(.system(size: 17, weight: .bold))
+                .buttonStyle(.plain)
             }
             .padding(16)
         }
@@ -107,14 +121,6 @@ struct FiltersView: View {
     }
     
     private func applyTapped() {
-        
+        dismiss()
     }
-}
-
-#Preview {
-    FiltersView()
-}
-#Preview {
-    FiltersView()
-        .preferredColorScheme(.dark)
 }
