@@ -16,7 +16,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		456B14E72EFB3A97003966DD /* Exceptions for "Trains" folder in "Trains" target */ = {
+		451C3C4D2EFB3C05004725D6 /* Exceptions for "Trains" folder in "Trains" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -29,7 +29,7 @@
 		4568C4D62ED543BA00B6D479 /* Trains */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				456B14E72EFB3A97003966DD /* Exceptions for "Trains" folder in "Trains" target */,
+				451C3C4D2EFB3C05004725D6 /* Exceptions for "Trains" folder in "Trains" target */,
 			);
 			path = Trains;
 			sourceTree = "<group>";
