@@ -2,11 +2,6 @@ import SwiftUI
 
 struct ErrorScreenView: View {
     
-    enum ErrorType {
-        case serverError
-        case noInternet
-    }
-    
     let errorType: ErrorType
     
     var image: Image {

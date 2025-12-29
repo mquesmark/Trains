@@ -2,16 +2,7 @@ import SwiftUI
 import Combine
 
 final class AppErrorState: ObservableObject {
-    @Published var error: ErrorScreenView.ErrorType? = nil
-}
-
-extension ErrorScreenView.ErrorType: Identifiable {
-    var id: String {
-        switch self {
-        case .serverError: return "serverError"
-        case .noInternet: return "noInternet"
-        }
-    }
+    @Published var error: ErrorType? = nil
 }
 
 enum TabKind: Int {
@@ -20,47 +11,60 @@ enum TabKind: Int {
 }
 
 struct ContentView: View {
-    init() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = .backgroundYP
-        appearance.shadowColor = UIColor.black.withAlphaComponent(0.3)
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
-    }
-
     @State private var tab: TabKind = .schedule
-    @StateObject private var errorState = AppErrorState()
+    @EnvironmentObject private var errorState: AppErrorState
 
     var body: some View {
         TabView(selection: $tab) {
             MainScreenView()
                 .tabItem {
-                    Image(tab == .schedule
-                          ? .scheduleActive
-                          : .scheduleInactive)
+                    tabIcon(for: .schedule)
                 }
                 .tag(TabKind.schedule)
 
             ErrorScreenView(errorType: .serverError)
                 .tabItem {
-                    Image(tab == .settings
-                          ? .settingsActive
-                          : .settingsInactive)
+                    tabIcon(for: .settings)
                 }
                 .tag(TabKind.settings)
         }
-        .environmentObject(errorState)
         .fullScreenCover(item: $errorState.error) { error in
             ErrorScreenView(errorType: error)
+        }
+    }
+
+    // MARK: - Tab Icons
+
+    private func tabIcon(for kind: TabKind) -> some View {
+        Image(tab == kind ? kind.activeIcon : kind.inactiveIcon)
+    }
+}
+
+// MARK: - TabKind Icons
+
+private extension TabKind {
+    var activeIcon: ImageResource {
+        switch self {
+        case .schedule: return .scheduleActive
+        case .settings: return .settingsActive
+        }
+    }
+
+    var inactiveIcon: ImageResource {
+        switch self {
+        case .schedule: return .scheduleInactive
+        case .settings: return .settingsInactive
         }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(AppErrorState())
 }
+
 #Preview {
     ContentView()
+        .environmentObject(AppErrorState())
         .preferredColorScheme(.dark)
 }

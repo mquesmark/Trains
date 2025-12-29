@@ -16,102 +16,143 @@ enum TimeIntervals: CaseIterable {
     }
 }
 
+
 struct FiltersView: View {
+
     @Environment(\.dismiss) private var dismiss
-    
+
     @Binding var timeSelection: Set<TimeIntervals>
     @Binding var showTransfers: Bool?
-    
+
     var body: some View {
         ZStack {
-            Color.backgroundYP
-                .ignoresSafeArea()
-            
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Время отправления")
-                    .font(.system(size: 24, weight: .bold))
-                
-                List(TimeIntervals.allCases, id: \.self) { interval in
-                    HStack {
-                        Text(interval.title)
-                        Spacer()
-                        Image(systemName: timeSelection.contains(interval) ? "checkmark.square.fill" : "square")
-                            .font(.system(size: 20, weight: .semibold))
-                    }
-                    .frame(height: 60)
-                    .listRowBackground(Color.backgroundYP)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                    .listRowSeparator(.hidden)
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        toggleTimeSelection(interval)
-                    }
-                }
-                .scrollDisabled(true)
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-                .background(Color.backgroundYP)
-                .frame(maxHeight: CGFloat(60 * TimeIntervals.allCases.count))
-                
-                Text("Показывать варианты с пересадками")
-                    .font(.system(size: 24, weight: .bold))
-                
-                List {
-                    Group {
-                        HStack {
-                            Text("Да")
-                            Spacer()
-                            Image((showTransfers ?? false) ? .circleSelected : .circle)
-                        }
-                        .frame(height: 60)
-                        .listRowSeparator(.hidden)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            showTransfers = true
-                        }
-                        HStack {
-                            Text("Нет")
-                            Spacer()
-                            Image(((showTransfers != nil) && showTransfers == false) ? .circleSelected : .circle)
-                        }
-                        .frame(height: 60)
-                        .listRowSeparator(.hidden)
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            showTransfers = false
-                        }
-                    }
-                    .listRowBackground(Color.backgroundYP)
-                    .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-                }
-                .scrollDisabled(true)
-                .listStyle(.plain)
-                .scrollContentBackground(.hidden)
-                .background(Color.backgroundYP)
-                .frame(maxHeight: CGFloat(60 * 2))
-                
-                Spacer()
-                
-                Button {
-                    applyTapped()
-                } label: {
-                    Text("Применить")
-                        .frame(height: 60)
-                        .frame(maxWidth: .infinity)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(Color.white)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.blueUniversal)
-                        )
-                        .contentShape(RoundedRectangle(cornerRadius: 16))
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(16)
+            backgroundView
+            contentView
         }
     }
-    
+
+    // MARK: - Content
+
+    private var contentView: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            timeTitleView
+            timeListView
+            transfersTitleView
+            transfersListView
+            Spacer()
+            applyButton
+        }
+        .padding(16)
+    }
+
+    // MARK: - Background
+
+    private var backgroundView: some View {
+        Color.backgroundYP
+            .ignoresSafeArea()
+    }
+
+    // MARK: - Time Filter
+
+    private var timeTitleView: some View {
+        Text("Время отправления")
+            .font(.system(size: 24, weight: .bold))
+    }
+
+    private var timeListView: some View {
+        List(TimeIntervals.allCases, id: \.self) { interval in
+            timeRow(interval)
+        }
+        .scrollDisabled(true)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.backgroundYP)
+        .frame(maxHeight: CGFloat(60 * TimeIntervals.allCases.count))
+    }
+
+    private func timeRow(_ interval: TimeIntervals) -> some View {
+        HStack {
+            Text(interval.title)
+            Spacer()
+            Image(
+                systemName: timeSelection.contains(interval)
+                ? "checkmark.square.fill"
+                : "square"
+            )
+            .font(.system(size: 20, weight: .semibold))
+        }
+        .frame(height: 60)
+        .listRowBackground(Color.backgroundYP)
+        .listRowInsets(.init(.zero))
+        .listRowSeparator(.hidden)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            toggleTimeSelection(interval)
+        }
+    }
+
+    // MARK: - Transfers Filter
+
+    private var transfersTitleView: some View {
+        Text("Показывать варианты с пересадками")
+            .font(.system(size: 24, weight: .bold))
+    }
+
+    private var transfersListView: some View {
+        List {
+            transferRow(title: "Да", isSelected: showTransfers == true) {
+                showTransfers = true
+            }
+
+            transferRow(title: "Нет", isSelected: showTransfers == false) {
+                showTransfers = false
+            }
+        }
+        .scrollDisabled(true)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .background(Color.backgroundYP)
+        .frame(maxHeight: 120)
+    }
+
+    private func transferRow(
+        title: String,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Image(isSelected ? .circleSelected : .circle)
+        }
+        .frame(height: 60)
+        .listRowBackground(Color.backgroundYP)
+        .listRowInsets(.init(.zero))
+        .listRowSeparator(.hidden)
+        .contentShape(Rectangle())
+        .onTapGesture(perform: action)
+    }
+
+    // MARK: - Apply Button
+
+    private var applyButton: some View {
+        Button(action: applyTapped) {
+            Text("Применить")
+                .frame(height: 60)
+                .frame(maxWidth: .infinity)
+                .font(.system(size: 17, weight: .bold))
+                .foregroundStyle(Color.white)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.blueUniversal)
+                )
+                .contentShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Actions
+
     private func toggleTimeSelection(_ interval: TimeIntervals) {
         if timeSelection.contains(interval) {
             timeSelection.remove(interval)
@@ -119,8 +160,9 @@ struct FiltersView: View {
             timeSelection.insert(interval)
         }
     }
-    
+
     private func applyTapped() {
         dismiss()
     }
 }
+

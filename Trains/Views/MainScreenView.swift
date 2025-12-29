@@ -1,10 +1,5 @@
 import SwiftUI
 
-enum PickTarget: Hashable {
-    case from
-    case to
-}
-
 enum Route: Hashable {
     case cities(PickTarget)
     case stations(PickTarget, city: String)
