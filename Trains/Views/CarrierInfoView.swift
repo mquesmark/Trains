@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CarrierInfoView: View {
     
-    let carrierInfo: CarrierInfo
+    var carrierInfo: CarrierInfo = .init(imageUrlString: "", name: "ОАО «РЖД»", email: "i.lozgkina@yandex.ru", phone: "+7 (904) 329-27-71")
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {

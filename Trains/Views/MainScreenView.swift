@@ -4,6 +4,7 @@ enum Route: Hashable {
     case cities(PickTarget)
     case stations(PickTarget, city: String)
     case results(routeString: String)
+    case carrierInfo
 }
 
 struct MainScreenView: View {
@@ -109,6 +110,8 @@ struct MainScreenView: View {
                                 .foregroundStyle(Color(.label))
                             }
                         }
+                case .carrierInfo:
+                    CarrierInfoView()
                 }
 
             }

@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct TrainsApp: App {
     @StateObject private var errorState = AppErrorState()
+    @AppStorage("isDarkThemeEnabled") private var isDarkThemeEnabled = false
 
     init() {
         let appearance = UITabBarAppearance()
@@ -18,6 +19,7 @@ struct TrainsApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(errorState)
+                .preferredColorScheme(isDarkThemeEnabled ? .dark : .light)
         }
     }
 }

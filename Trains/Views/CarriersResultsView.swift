@@ -22,9 +22,15 @@ struct CarriersResultsView: View {
                 } else {
                     List {
                         ForEach(allCarriers) { carrier in
-                            CarrierCardView(carrier: carrier)
-                                .listRowSeparator(.hidden)
-                                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
+                            Button {
+                                path.append(.carrierInfo)
+                            } label: {
+                                CarrierCardView(carrier: carrier)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .listRowSeparator(.hidden)
+                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
                         }
                     }
                     .listStyle(.plain)
