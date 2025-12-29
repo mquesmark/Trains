@@ -25,7 +25,7 @@ struct CarrierInfoView: View {
                 }
                 .frame(height: 60)
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: .zero) {
                     Text("Телефон")
                         .font(.system(size: 17, weight: .regular))
 
