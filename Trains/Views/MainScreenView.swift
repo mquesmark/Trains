@@ -95,7 +95,7 @@ struct MainScreenView: View {
             .toolbar(.hidden, for: .tabBar)
             .navigationBarBackButtonHidden(true)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .topBarLeading) {
                     backButton
                 }
             }
@@ -103,15 +103,21 @@ struct MainScreenView: View {
         case .results(let routeString):
             CarriersResultsView(routeString: routeString, path: $path)
                 .toolbar(.hidden, for: .tabBar)
-                .navigationBarBackButtonHidden(true)
+                .navigationBarBackButtonHidden()
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
+                    ToolbarItem(placement: .topBarLeading) {
                         backButton
                     }
                 }
 
         case .carrierInfo:
             CarrierInfoView()
+                .navigationBarBackButtonHidden()
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        backButton
+                    }
+                }
 
         case .story(let startIndex):
             StoriesView(
