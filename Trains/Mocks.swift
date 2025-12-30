@@ -1,3 +1,5 @@
+import SwiftUI
+
 final class Mocks {
     static let citiesStrings =  [
         "Москва", "Санкт-Петербург", "Новосибирск", "Казань",
@@ -132,5 +134,14 @@ final class Mocks {
             name: "РЖД",
             warningText: "Ночной рейс"
         )
+    ]
+    
+    static let stories: [Story] = [
+        Story(isWatched: false, previewImage: Image(.story1Full), previewTitle: "Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1", fullImage: Image(.story1Full), title: "Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1", fullText: "Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1 Text1"),
+        Story(isWatched: false, previewImage: Image(.story2Full), previewTitle: "Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2", fullImage: Image(.story2Full), title: "Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2", fullText: "Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2 Text2"),
+        Story(isWatched: false, previewImage: Image(.story3Full), previewTitle: "Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3", fullImage: Image(.story3Full), title: "Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3", fullText: "Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3 Text3"),
+        Story(isWatched: false, previewImage: Image(.story3Full), previewTitle: "Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4", fullImage: Image(.story3Full), title: "Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4", fullText: "Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4 Text4"),
+        Story(isWatched: false, previewImage: Image(.story2Full), previewTitle: "Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5", fullImage: Image(.story2Full), title: "Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5", fullText: "Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5"),
+        Story(isWatched: false, previewImage: Image(.story1Full), previewTitle: "Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6", fullImage: Image(.story1Full), title: "Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6", fullText: "Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6")
     ]
 }
