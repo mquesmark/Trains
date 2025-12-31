@@ -2,35 +2,40 @@ import SwiftUI
 import Combine
 
 struct StoriesView: View {
-    struct Configuration {
-        let timerTickInternal: TimeInterval
-        let progressPerTick: CGFloat
 
-        init(
-            storiesCount: Int,
-            secondsPerStory: TimeInterval = 5,
-            timerTickInternal: TimeInterval = 0.05
-        ) {
-            self.timerTickInternal = timerTickInternal
-            self.progressPerTick = 1.0 / CGFloat(storiesCount) / secondsPerStory * timerTickInternal
-        }
-    }
+    // MARK: - Input / Dependencies
 
     private let stories: [Story]
-    private let configuration: Configuration
-    private var currentStory: Story { stories[currentStoryIndex] }
+    private let configuration: StoriesConfiguration
+    private let onStoryShown: ((UUID) -> Void)?
+
+    // MARK: - Environment
+
+    @Environment(\.dismiss) private var dismiss
+
+    // MARK: - State
+
+    @State private var progress: CGFloat
+    @State private var shownIDs: Set<UUID> = []
+
+    // MARK: - Timer / Combine
+
+    @State private var timer: Timer.TimerPublisher
+    @State private var cancellable: Cancellable?
+
+    // MARK: - Computed properties
+
     private var currentStoryIndex: Int {
         let count = max(stories.count, 1)
         return min(Int(progress * CGFloat(count)), count - 1)
     }
-    @State private var progress: CGFloat
-    @Environment(\.dismiss) private var dismiss
 
-    private let onStoryShown: ((UUID) -> Void)?
-    @State private var shownIDs: Set<UUID> = []
+    private var currentStory: Story {
+        stories[currentStoryIndex]
+    }
 
-    @State private var timer: Timer.TimerPublisher
-    @State private var cancellable: Cancellable?
+    // MARK: - Init
+
     init(
         stories: [Story] = Mocks.stories,
         startIndex: Int = 0,
@@ -38,7 +43,7 @@ struct StoriesView: View {
     ) {
         self.stories = stories
         self.onStoryShown = onStoryShown
-        configuration = Configuration(storiesCount: stories.count)
+        configuration = StoriesConfiguration(storiesCount: stories.count)
         timer = StoriesView.createTimer(configuration: configuration)
 
         let count = stories.count
@@ -50,6 +55,8 @@ struct StoriesView: View {
         let index = max(0, min(startIndex, count - 1))
         progress = CGFloat(index) / CGFloat(count)
     }
+
+    // MARK: - Body
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -84,20 +91,24 @@ struct StoriesView: View {
         .onAppear {
             reportShown(id: currentStory.id)
         }
-        .onChange(of: currentStory.id) { newId in
+        .onChange(of: currentStory.id) { _, newId in
             reportShown(id: newId)
         }
     }
     
+    // MARK: - Story shown reporting
+
     private func reportShown(id: UUID) {
         guard !shownIDs.contains(id) else { return }
         shownIDs.insert(id)
         onStoryShown?(id)
     }
 
+    // MARK: - Gestures
+
     private var gestureLayer: some View {
         GeometryReader { geo in
-            HStack(spacing: 0) {
+            HStack(spacing: .zero) {
                 Color.clear
                     .contentShape(Rectangle())
                     .onTapGesture {
@@ -138,6 +149,8 @@ struct StoriesView: View {
             }
     }
 
+    // MARK: - Timer
+
     private func timerTick() {
         var nextProgress = progress + configuration.progressPerTick
         if nextProgress >= 1 {
@@ -147,6 +160,8 @@ struct StoriesView: View {
             progress = nextProgress
         }
     }
+
+    // MARK: - Story navigation
 
     private func nextStory() {
         let storiesCount = stories.count
@@ -173,7 +188,7 @@ struct StoriesView: View {
         cancellable = timer.connect()
     }
 
-    private static func createTimer(configuration: Configuration) -> Timer.TimerPublisher {
+    private static func createTimer(configuration: StoriesConfiguration) -> Timer.TimerPublisher {
         Timer.publish(every: configuration.timerTickInternal, on: .main, in: .common)
     }
 }
