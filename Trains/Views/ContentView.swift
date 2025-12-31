@@ -22,7 +22,7 @@ struct ContentView: View {
                 }
                 .tag(TabKind.schedule)
 
-            ErrorScreenView(errorType: .serverError)
+            SettingsView()
                 .tabItem {
                     tabIcon(for: .settings)
                 }
