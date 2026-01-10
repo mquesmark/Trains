@@ -11,18 +11,9 @@ enum Route: Hashable {
 struct MainScreenView: View {
 
     @State private var path: [Route] = []
-    @State private var fromCity: String? = nil
-    @State private var fromStation: String? = nil
-    @State private var toCity: String? = nil
-    @State private var toStation: String? = nil
-    @State private var storiesPreview: [Story] = Mocks.stories
-
-    private var canSearch: Bool {
-        fromCity != nil && fromStation != nil && toCity != nil && toStation != nil
-    }
-    private var routeString: String {
-        "\(fromCity!) (\(fromStation!)) → \(toCity!) (\(toStation!))"
-    }
+    
+    @State private var viewModel = MainScreenViewModel()
+    
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -43,7 +34,7 @@ struct MainScreenView: View {
 
             directionView
 
-            if canSearch {
+            if viewModel.canSearch {
                 searchButton
             }
 
@@ -54,8 +45,8 @@ struct MainScreenView: View {
     private var storiesStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 12) {
-                ForEach(storiesPreview.indices, id: \.self) { index in
-                    let storyModel = storiesPreview[index]
+                ForEach(viewModel.storiesPreview.indices, id: \.self) { index in
+                    let storyModel = viewModel.storiesPreview[index]
                     StoryPreviewView(model: storyModel)
                         .onTapGesture {
                             path.append(.story(startIndex: index))
@@ -87,10 +78,10 @@ struct MainScreenView: View {
                 target: target,
                 city: city,
                 path: $path,
-                fromCity: $fromCity,
-                fromStation: $fromStation,
-                toCity: $toCity,
-                toStation: $toStation
+                fromCity: $viewModel.fromCity,
+                fromStation: $viewModel.fromStation,
+                toCity: $viewModel.toCity,
+                toStation: $viewModel.toStation
             )
             .toolbar(.hidden, for: .tabBar)
             .navigationBarBackButtonHidden(true)
@@ -121,12 +112,10 @@ struct MainScreenView: View {
 
         case .story(let startIndex):
             StoriesView(
-                stories: storiesPreview,
+                stories: viewModel.storiesPreview,
                 startIndex: startIndex,
                 onStoryShown: { shownId in
-                    if let index = storiesPreview.firstIndex(where: { $0.id == shownId }) {
-                        storiesPreview[index].isWatched = true
-                    }
+                    viewModel.markStoryWatched(id: shownId)
                 }
             )
             .toolbar(.hidden, for: .tabBar)
@@ -137,12 +126,13 @@ struct MainScreenView: View {
     
     private var directionView: some View {
         DirectionView(
-            fromCity: $fromCity,
-            fromStation: $fromStation,
-            toCity: $toCity,
-            toStation: $toStation,
+            fromCity: $viewModel.fromCity,
+            fromStation: $viewModel.fromStation,
+            toCity: $viewModel.toCity,
+            toStation: $viewModel.toStation,
             onFromTap: { path.append(.cities(.from)) },
-            onToTap: { path.append(.cities(.to)) }
+            onToTap: { path.append(.cities(.to)) },
+            onSwap: { viewModel.swapDirections() }
         )
         .padding(.init(top: 20, leading: 16, bottom: 16, trailing: 16))
     }
@@ -166,7 +156,9 @@ struct MainScreenView: View {
 
     private var backButton: some View {
         Button {
-            path.removeLast()
+            if !path.isEmpty {
+                path.removeLast()
+            }
         } label: {
             Image(systemName: "chevron.left")
                 .font(.system(size: 18, weight: .semibold))
@@ -178,6 +170,7 @@ struct MainScreenView: View {
     }
 
     private func searchTapped() {
+        guard let routeString = viewModel.routeString else { return }
         path.append(.results(routeString: routeString))
     }
 }

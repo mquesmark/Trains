@@ -23,6 +23,7 @@ struct DirectionView: View {
     let toPlaceholder = "Куда"
     let onFromTap: () -> Void
     let onToTap: () -> Void
+    let onSwap: () -> Void
 
     var body: some View {
         ZStack {
@@ -55,7 +56,7 @@ struct DirectionView: View {
                 )
                 .padding(16)
                 Button {
-                    switchButtonTapped()
+                    onSwap()
                 } label: {
                     Image("change")
                 }
@@ -64,11 +65,6 @@ struct DirectionView: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: 120)
-    }
-
-    private func switchButtonTapped() {
-        swap(&fromCity, &toCity)
-        swap(&fromStation, &toStation)
     }
 }
 
@@ -86,7 +82,8 @@ struct DirectionView: View {
                 toCity: $toCity,
                 toStation: $toStation,
                 onFromTap: {},
-                onToTap: {}
+                onToTap: {},
+                onSwap: {}
             )
             .padding()
             .background(Color(.systemGroupedBackground))
