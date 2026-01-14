@@ -9,54 +9,36 @@ struct StationSelectionView: View {
     @Binding var fromStation: String?
     @Binding var toCity: String?
     @Binding var toStation: String?
-    
-    private var stations: [String] {
-        switch city {
-        case "Москва":
-            return Mocks.moscowMockStations
-        case "Санкт-Петербург":
-            return Mocks.spbMockStations
-        case "Новосибирск":
-            return Mocks.novosibirskMockStations
-        case "Казань":
-            return Mocks.kazanMockStations
-        case "Омск":
-            return Mocks.omskMockStations
-        case "Томск":
-            return Mocks.tomskMockStations
-        case "Челябинск":
-            return Mocks.chelyabinskMockStations
-        case "Иркутск":
-            return Mocks.irkutskMockStations
-        case "Ярославль":
-            return Mocks.yaroslavlMockStations
-        case "Нижний Новгород":
-            return Mocks.nizhnyNovgorodMockStations
-        default:
-            return []
-        }
-    }
 
-    @State private var searchText = ""
+    @StateObject private var viewModel: StationSelectionViewModel
 
-    private var filteredStations: [String] {
-        if searchText.isEmpty {
-            return stations
-        } else {
-            return stations.filter {
-                $0.localizedCaseInsensitiveContains(searchText)
-            }
-        }
+    init(
+        target: PickTarget,
+        city: String,
+        path: Binding<[Route]>,
+        fromCity: Binding<String?>,
+        fromStation: Binding<String?>,
+        toCity: Binding<String?>,
+        toStation: Binding<String?>
+    ) {
+        self.target = target
+        self.city = city
+        self._path = path
+        self._fromCity = fromCity
+        self._fromStation = fromStation
+        self._toCity = toCity
+        self._toStation = toStation
+        self._viewModel = StateObject(wrappedValue: StationSelectionViewModel(city: city))
     }
 
     var body: some View {
         Group {
-            if !searchText.isEmpty && filteredStations.isEmpty {
+            if viewModel.isNotFoundStation {
                 Text("Станция не найдена")
                     .font(.system(size: 17, weight: .semibold))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(filteredStations, id: \.self) { station in
+                List(viewModel.filteredStations, id: \.self) { station in
                     HStack {
                         Text(station)
                             .font(.system(size: 17, weight: .regular))
@@ -83,7 +65,7 @@ struct StationSelectionView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(.backgroundYP)
         .searchable(
-            text: $searchText,
+            text: $viewModel.searchText,
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Введите запрос"
         )

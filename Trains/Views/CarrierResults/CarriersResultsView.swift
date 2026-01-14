@@ -1,12 +1,10 @@
 import SwiftUI
 
 struct CarriersResultsView: View {
-    let allCarriers: [CarrierCardModel] = Mocks.mockCarrierCards
     let routeString: String
     @Binding var path: [Route]
     
-    @State private var timeSelection: Set<TimeIntervals> = []
-    @State private var showTransfers: Bool? = nil
+    @StateObject private var viewModel = CarriersResultsViewModel()
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -15,13 +13,13 @@ struct CarriersResultsView: View {
                     .font(.system(size: 24, weight: .bold))
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
-                if allCarriers.isEmpty {
+                if viewModel.isCarriersListEmpty {
                     Text("Вариантов нет")
                         .font(.system(size: 24, weight: .bold))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     List {
-                        ForEach(allCarriers) { carrier in
+                        ForEach(viewModel.filteredCarriers) { carrier in
                             Button {
                                 path.append(.carrierInfo)
                             } label: {
@@ -41,11 +39,11 @@ struct CarriersResultsView: View {
                 }
             }
             
-            if !allCarriers.isEmpty {
+            if !viewModel.isCarriersListEmpty {
                 NavigationLink {
                     FiltersView(
-                        timeSelection: $timeSelection,
-                        showTransfers: $showTransfers
+                        timeSelection: $viewModel.timeSelection,
+                        showTransfers: $viewModel.showTransfers
                     )
                     .toolbar(.hidden, for: .tabBar)
                     .navigationBarBackButtonHidden(true)
@@ -64,7 +62,7 @@ struct CarriersResultsView: View {
                     HStack(spacing: 4) {
                         Text("Уточнить время")
 
-                        if !timeSelection.isEmpty {
+                        if !viewModel.timeSelection.isEmpty {
                             Circle()
                                 .fill(Color.redUniversal)
                                 .frame(width: 8, height: 8)
