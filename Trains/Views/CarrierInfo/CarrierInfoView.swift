@@ -1,8 +1,13 @@
 import SwiftUI
 
 struct CarrierInfoView: View {
+    var carrierName: String
+    @StateObject private var viewModel: CarrierInfoViewModel
     
-    var carrierInfo: CarrierInfo = .init(imageUrlString: "", name: "ОАО «РЖД»", email: "i.lozgkina@yandex.ru", phone: "+7 (904) 329-27-71")
+    init(carrierName: String) {
+        self.carrierName = carrierName
+        _viewModel = StateObject(wrappedValue: CarrierInfoViewModel(carrierName: carrierName))
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -10,7 +15,7 @@ struct CarrierInfoView: View {
                 .resizable()
                 .scaledToFit()
             
-            Text(carrierInfo.name)
+            Text(viewModel.carrierInfo.name)
                 .font(.system(size: 24, weight: .bold))
             
             VStack(alignment: .leading, spacing: .zero) {
@@ -19,7 +24,7 @@ struct CarrierInfoView: View {
                     Text("E-mail")
                         .font(.system(size: 17, weight: .regular))
 
-                    Text(carrierInfo.email)
+                    Text(viewModel.carrierInfo.email)
                         .font(.system(size: 12, weight: .regular))
                         .foregroundColor(.blueUniversal)
                 }
@@ -29,7 +34,7 @@ struct CarrierInfoView: View {
                     Text("Телефон")
                         .font(.system(size: 17, weight: .regular))
 
-                    Text(carrierInfo.phone)
+                    Text(viewModel.carrierInfo.phone)
                         .font(.system(size: 12, weight: .regular))
                         .foregroundColor(.blueUniversal)
                 }
@@ -46,5 +51,5 @@ struct CarrierInfoView: View {
 }
 
 #Preview {
-    CarrierInfoView(carrierInfo: .init(imageUrlString: "", name: "ОАО «РЖД»", email: "i.lozgkina@yandex.ru", phone: "+7 (904) 329-27-71"))
+    CarrierInfoView(carrierName: "RZD")
 }

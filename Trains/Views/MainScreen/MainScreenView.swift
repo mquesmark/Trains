@@ -102,7 +102,7 @@ struct MainScreenView: View {
                 }
 
         case .carrierInfo:
-            CarrierInfoView()
+            CarrierInfoView(carrierName: "")
                 .navigationBarBackButtonHidden()
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {

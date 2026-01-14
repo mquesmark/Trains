@@ -1,5 +1,9 @@
 import SwiftUI
 
+/// Этот экран намеренно реализован без ViewModel.
+/// Он только отображает переданное состояние ошибки
+/// и не содержит бизнес-логики или управления данными.
+
 struct ErrorScreenView: View {
     
     let errorType: ErrorType
@@ -13,7 +17,7 @@ struct ErrorScreenView: View {
             
         }
     }
-    
+
     var text: String {
         switch errorType {
         case .noInternet:

@@ -1,5 +1,9 @@
 import SwiftUI
 
+/// Этот компонент намеренно реализован без ViewModel.
+/// "DirectionView" — внутренняя UI-вью "MainScreen": она получает данные через "@Binding" и сообщает о действиях через колбэки,
+/// а состояние и логика сценария находятся в "MainScreenViewModel".
+
 struct DirectionView: View {
     @Binding var fromCity: String?
     @Binding var fromStation: String?

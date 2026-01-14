@@ -144,4 +144,6 @@ final class Mocks {
         Story(isWatched: false, previewImage: Image(.story2Full), previewTitle: "Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5", fullImage: Image(.story2Full), title: "Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5", fullText: "Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5 Text5"),
         Story(isWatched: false, previewImage: Image(.story1Full), previewTitle: "Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6", fullImage: Image(.story1Full), title: "Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6", fullText: "Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6 Text6")
     ]
+    
+    static let carrierInfo: CarrierInfo = .init(imageUrlString: "", name: "ОАО «РЖД»", email: "i.lozgkina@yandex.ru", phone: "+7 (904) 329-27-71")
 }
