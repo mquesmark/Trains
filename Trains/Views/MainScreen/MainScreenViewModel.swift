@@ -1,15 +1,15 @@
-import Observation
 import Foundation
+import Combine
 
-@Observable
-final class MainScreenViewModel {
+@MainActor
+final class MainScreenViewModel: ObservableObject {
     
-    var fromCity: String? = nil
-    var fromStation: String? = nil
-    var toCity: String? = nil
-    var toStation: String? = nil
+    @Published var fromCity: String? = nil
+    @Published var fromStation: String? = nil
+    @Published var toCity: String? = nil
+    @Published var toStation: String? = nil
     
-    var storiesPreview: [Story] = Mocks.stories
+    @Published var storiesPreview: [Story] = Mocks.stories
     
     var canSearch: Bool {
         fromCity != nil && fromStation != nil && toCity != nil && toStation != nil

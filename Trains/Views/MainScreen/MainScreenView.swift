@@ -12,7 +12,7 @@ struct MainScreenView: View {
 
     @State private var path: [Route] = []
     
-    @State private var viewModel = MainScreenViewModel()
+    @StateObject private var viewModel = MainScreenViewModel()
     
 
     var body: some View {

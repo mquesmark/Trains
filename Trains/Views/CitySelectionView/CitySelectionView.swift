@@ -3,28 +3,17 @@ import SwiftUI
 struct CitySelectionView: View {
     let target: PickTarget
     @Binding var path: [Route]
-    
-    let cities: [String] = Mocks.citiesStrings
-    
-    @State private var searchText = ""
-    var filteredCities: [String] {
-        if searchText.isEmpty {
-            return cities
-        } else {
-            return cities.filter {
-                $0.localizedCaseInsensitiveContains(searchText)
-            }
-        }
-    }
+        
+    @StateObject private var viewModel = CitySelectionViewModel()
     
     var body: some View {
         Group {
-            if !searchText.isEmpty && filteredCities.isEmpty {
+            if viewModel.isNotFoundState {
                 Text("Город не найден")
                     .font(.system(size: 24, weight: .bold))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(filteredCities, id: \.self) { city in
+                List(viewModel.filteredCities, id: \.self) { city in
                     HStack {
                         Text(city)
                             .font(.system(size: 17, weight: .regular))
@@ -49,7 +38,7 @@ struct CitySelectionView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(.backgroundYP)
         .searchable(
-            text: $searchText,
+            text: $viewModel.searchText,
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Введите запрос"
         )
