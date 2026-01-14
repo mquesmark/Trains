@@ -69,6 +69,14 @@ struct StationSelectionView: View {
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Введите запрос"
         )
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                .onEnded { value in
+                    if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                        path.removeLast()
+                    }
+                }
+        )
     }
 
     private func didSelectStation(_ station: String) {

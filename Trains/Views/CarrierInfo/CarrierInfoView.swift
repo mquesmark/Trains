@@ -3,6 +3,7 @@ import SwiftUI
 struct CarrierInfoView: View {
     var carrierName: String
     @StateObject private var viewModel: CarrierInfoViewModel
+    @Environment(\.dismiss) private var dismiss
     
     init(carrierName: String) {
         self.carrierName = carrierName
@@ -44,7 +45,16 @@ struct CarrierInfoView: View {
             
             Spacer()
         }
+        .contentShape(Rectangle())
         .padding(16)
+        .highPriorityGesture(
+            DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                .onEnded { value in
+                    if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                        dismiss()
+                    }
+                }
+        )
     }
     
     

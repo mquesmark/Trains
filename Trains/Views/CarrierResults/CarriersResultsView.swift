@@ -82,6 +82,14 @@ struct CarriersResultsView: View {
                 .padding(.bottom, 24)
             }
         }
+        .highPriorityGesture(
+            DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                .onEnded { value in
+                    if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                        path.removeLast()
+                    }
+                }
+        )
     }
 }
 

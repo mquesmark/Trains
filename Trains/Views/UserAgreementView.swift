@@ -20,7 +20,14 @@ struct UserAgreementView: View {
                 }
             }
             .toolbar(.hidden, for: .tabBar)
-
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                    .onEnded { value in
+                        if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                            dismiss()
+                        }
+                    }
+            )
     }
     
     private var backButton: some View {
