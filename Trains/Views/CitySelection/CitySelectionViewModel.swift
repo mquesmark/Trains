@@ -20,7 +20,7 @@ final class CitySelectionViewModel: ObservableObject {
         
         do {
             try await stationsRepository.loadInfoIfNeeded()
-            cities = await stationsRepository.getCities(search: "")
+            cities = await stationsRepository.getCities()
         } catch {
             errorText = "Не удалось загрузить список городов"
         }

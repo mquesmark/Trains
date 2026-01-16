@@ -3,53 +3,48 @@ import Combine
 
 @MainActor
 final class StationSelectionViewModel: ObservableObject {
-    init(city: String) {
+    private let stationsRepository: StationsRepository
+    
+    init(city: City, stationsRepository: StationsRepository) {
         self.city = city
+        self.stationsRepository = stationsRepository
     }
     
-    let city: String
-    
-    private var stations: [String] {
-        switch city {
-        case "Москва":
-            return Mocks.moscowMockStations
-        case "Санкт-Петербург":
-            return Mocks.spbMockStations
-        case "Новосибирск":
-            return Mocks.novosibirskMockStations
-        case "Казань":
-            return Mocks.kazanMockStations
-        case "Омск":
-            return Mocks.omskMockStations
-        case "Томск":
-            return Mocks.tomskMockStations
-        case "Челябинск":
-            return Mocks.chelyabinskMockStations
-        case "Иркутск":
-            return Mocks.irkutskMockStations
-        case "Ярославль":
-            return Mocks.yaroslavlMockStations
-        case "Нижний Новгород":
-            return Mocks.nizhnyNovgorodMockStations
-        default:
-            return []
-        }
-    }
-    
+    let city: City
+        
     @Published var searchText = ""
+    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var stations: [Station] = []
+    @Published private(set) var errorText: String? = nil
     
-    var filteredStations: [String] {
+    var filteredStations: [Station] {
         if searchText.isEmpty {
             stations
         } else {
             stations.filter {
-                $0.localizedCaseInsensitiveContains(searchText)
+                $0.title.localizedCaseInsensitiveContains(searchText)
             }
         }
     }
     
+    func load() async {
+        isLoading = true
+        errorText = nil
+        defer {
+            isLoading = false
+        }
+        do {
+            try await stationsRepository.loadInfoIfNeeded()
+            stations = await stationsRepository.getStations(forCityWithId: city.id)
+        } catch {
+            errorText = "Ошибка загрузки станций"
+        }
+        
+    }
+    
     var isNotFoundStation: Bool {
-        filteredStations.isEmpty && !searchText.isEmpty
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return filteredStations.isEmpty && !query.isEmpty && !isLoading && errorText == nil
     }
     
 }

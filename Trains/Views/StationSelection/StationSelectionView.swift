@@ -3,23 +3,24 @@ import SwiftUI
 struct StationSelectionView: View {
 
     let target: PickTarget
-    let city: String
+    let city: City
     @Binding var path: [Route]
-    @Binding var fromCity: String?
-    @Binding var fromStation: String?
-    @Binding var toCity: String?
-    @Binding var toStation: String?
+    @Binding var fromCity: City?
+    @Binding var fromStation: Station?
+    @Binding var toCity: City?
+    @Binding var toStation: Station?
 
     @StateObject private var viewModel: StationSelectionViewModel
 
     init(
         target: PickTarget,
-        city: String,
+        city: City,
         path: Binding<[Route]>,
-        fromCity: Binding<String?>,
-        fromStation: Binding<String?>,
-        toCity: Binding<String?>,
-        toStation: Binding<String?>
+        fromCity: Binding<City?>,
+        fromStation: Binding<Station?>,
+        toCity: Binding<City?>,
+        toStation: Binding<Station?>,
+        stationsRepository: StationsRepository
     ) {
         self.target = target
         self.city = city
@@ -28,19 +29,26 @@ struct StationSelectionView: View {
         self._fromStation = fromStation
         self._toCity = toCity
         self._toStation = toStation
-        self._viewModel = StateObject(wrappedValue: StationSelectionViewModel(city: city))
+        self._viewModel = StateObject(wrappedValue: StationSelectionViewModel(city: city, stationsRepository: stationsRepository))
     }
 
     var body: some View {
         Group {
-            if viewModel.isNotFoundStation {
+            if viewModel.isLoading {
+                ProgressView("Загрузка станций...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let errorText = viewModel.errorText {
+                Text(errorText)
+                    .font(.system(size: 24, weight: .bold))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.isNotFoundStation {
                 Text("Станция не найдена")
                     .font(.system(size: 17, weight: .semibold))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(viewModel.filteredStations, id: \.self) { station in
+                List(viewModel.filteredStations) { station in
                     HStack {
-                        Text(station)
+                        Text(station.title)
                             .font(.system(size: 17, weight: .regular))
                         Spacer()
                         Image(systemName: "chevron.right")
@@ -55,7 +63,7 @@ struct StationSelectionView: View {
                     )
                     .listRowSeparator(.hidden)
                     .onTapGesture {
-                        didSelectStation(station)
+                      didSelectStation(station)
                     }
                 }
                 .listStyle(.plain)
@@ -64,6 +72,9 @@ struct StationSelectionView: View {
         .navigationTitle("Выбор станции")
         .navigationBarTitleDisplayMode(.inline)
         .background(.backgroundYP)
+        .task {
+            await viewModel.load()
+        }
         .searchable(
             text: $viewModel.searchText,
             placement: .navigationBarDrawer(displayMode: .always),
@@ -72,14 +83,14 @@ struct StationSelectionView: View {
         .simultaneousGesture(
             DragGesture(minimumDistance: 20, coordinateSpace: .local)
                 .onEnded { value in
-                    if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                    if value.translation.width > 80 && abs(value.translation.height) < 40 && !path.isEmpty {
                         path.removeLast()
                     }
                 }
         )
     }
 
-    private func didSelectStation(_ station: String) {
+    private func didSelectStation(_ station: Station) {
         switch target {
         case .from:
             fromCity = city

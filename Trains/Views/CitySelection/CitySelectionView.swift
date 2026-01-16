@@ -68,6 +68,6 @@ struct CitySelectionView: View {
     }
     
     private func didSelectCity(_ city: City) {
-        path.append(.stations(target, city: city.title))
+        path.append(.stations(target, city: city))
     }
 }

@@ -5,22 +5,22 @@ import SwiftUI
 /// а состояние и логика сценария находятся в "MainScreenViewModel".
 
 struct DirectionView: View {
-    @Binding var fromCity: String?
-    @Binding var fromStation: String?
-    @Binding var toCity: String?
-    @Binding var toStation: String?
+    @Binding var fromCity: City?
+    @Binding var fromStation: Station?
+    @Binding var toCity: City?
+    @Binding var toStation: Station?
 
     var fromText: String? {
         guard let city = fromCity, let station = fromStation else {
             return nil
         }
-        return "\(city) (\(station))"
+        return "\(city.title) (\(station.title))"
     }
     var toText: String? {
         guard let city = toCity, let station = toStation else {
             return nil
         }
-        return "\(city) (\(station))"
+        return "\(city.title) (\(station.title))"
     }
 
     let fromPlaceholder = "Откуда"
@@ -70,29 +70,4 @@ struct DirectionView: View {
         .frame(maxWidth: .infinity)
         .frame(height: 120)
     }
-}
-
-#Preview {
-    struct PreviewWrapper: View {
-        @State private var fromCity: String? = "Москва"
-        @State private var fromStation: String? = "Ленинградский"
-        @State private var toCity: String? = "Санкт-Петербург"
-        @State private var toStation: String? = "Московский"
-
-        var body: some View {
-            DirectionView(
-                fromCity: $fromCity,
-                fromStation: $fromStation,
-                toCity: $toCity,
-                toStation: $toStation,
-                onFromTap: {},
-                onToTap: {},
-                onSwap: {}
-            )
-            .padding()
-            .background(Color(.systemGroupedBackground))
-        }
-    }
-
-    return PreviewWrapper()
 }

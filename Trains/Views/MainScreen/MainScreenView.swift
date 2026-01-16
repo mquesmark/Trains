@@ -2,7 +2,7 @@ import SwiftUI
 
 enum Route: Hashable {
     case cities(PickTarget)
-    case stations(PickTarget, city: String)
+    case stations(PickTarget, city: City)
     case results(routeString: String)
     case carrierInfo
     case story(startIndex: Int)
@@ -21,6 +21,9 @@ struct MainScreenView: View {
                 .navigationDestination(for: Route.self) { route in
                     destination(for: route)
                 }
+        }
+        .task {
+            try? await stationsRepository.loadInfoIfNeeded()
         }
     }
 
@@ -80,7 +83,8 @@ struct MainScreenView: View {
                 fromCity: $viewModel.fromCity,
                 fromStation: $viewModel.fromStation,
                 toCity: $viewModel.toCity,
-                toStation: $viewModel.toStation
+                toStation: $viewModel.toStation,
+                stationsRepository: stationsRepository
             )
             .toolbar(.hidden, for: .tabBar)
             .navigationBarBackButtonHidden(true)

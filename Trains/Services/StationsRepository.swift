@@ -54,14 +54,7 @@ actor StationsRepository {
         self.isLoaded = true
     }
 
-    func getCities(search: String) -> [City] {
-        guard !search.isEmpty else { return citiesCache }
-        return citiesCache.filter { $0.title.localizedCaseInsensitiveContains(search) }
-    }
+    func getCities() -> [City] { return citiesCache }
     
-    func getStations(forCityWithId cityId: String, search: String) -> [Station] {
-        let stations = stationsByCityIdDict[cityId] ?? []
-        guard !search.isEmpty else { return stations }
-        return stations.filter { $0.title.localizedCaseInsensitiveContains(search) }
-    }
+    func getStations(forCityWithId cityId: String) -> [Station] { stationsByCityIdDict[cityId] ?? [] }
 }

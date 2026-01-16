@@ -3,11 +3,11 @@ import Combine
 
 @MainActor
 final class MainScreenViewModel: ObservableObject {
-    
-    @Published var fromCity: String? = nil
-    @Published var fromStation: String? = nil
-    @Published var toCity: String? = nil
-    @Published var toStation: String? = nil
+
+    @Published var fromCity: City? = nil
+    @Published var fromStation: Station? = nil
+    @Published var toCity: City? = nil
+    @Published var toStation: Station? = nil
     
     @Published var storiesPreview: [Story] = Mocks.stories
     
