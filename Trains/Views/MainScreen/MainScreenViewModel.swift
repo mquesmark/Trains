@@ -17,7 +17,7 @@ final class MainScreenViewModel: ObservableObject {
     
     var routeString: String? {
         guard let fromCity, let fromStation, let toCity, let toStation else { return nil }
-        return "\(fromCity) (\(fromStation)) → \(toCity) (\(toStation))"
+        return "\(fromCity.title) (\(fromStation.title)) → \(toCity.title) (\(toStation.title))"
 
     }
     
