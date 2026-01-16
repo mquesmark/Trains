@@ -88,6 +88,8 @@ struct StationSelectionView: View {
             toCity = city
             toStation = station
         }
+
         path.removeAll()
     }
+    
 }
