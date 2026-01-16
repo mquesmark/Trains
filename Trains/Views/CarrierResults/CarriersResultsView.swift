@@ -1,11 +1,20 @@
 import SwiftUI
 
 struct CarriersResultsView: View {
-    let routeString: String
     @Binding var path: [Route]
-    
-    @StateObject private var viewModel = CarriersResultsViewModel()
-    
+    let fromStation: Station
+    let fromCity: City
+    let toStation: Station
+    let toCity: City
+
+    var routeString: String {
+        ""
+    }
+
+    @StateObject private var viewModel = CarriersResultsViewModel(
+        client: APIEnvironment.shared.searchClient
+    )
+
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 16) {
@@ -13,7 +22,14 @@ struct CarriersResultsView: View {
                     .font(.system(size: 24, weight: .bold))
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
-                if viewModel.isCarriersListEmpty {
+                if viewModel.isLoading {
+                    ProgressView("Загрузка вариантов...")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if let errorText = viewModel.errorText {
+                    Text(errorText)
+                        .font(.system(size: 24, weight: .bold))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if viewModel.isCarriersListEmpty {
                     Text("Вариантов нет")
                         .font(.system(size: 24, weight: .bold))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -28,7 +44,14 @@ struct CarriersResultsView: View {
                             }
                             .buttonStyle(.plain)
                             .listRowSeparator(.hidden)
-                            .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
+                            .listRowInsets(
+                                EdgeInsets(
+                                    top: 0,
+                                    leading: 16,
+                                    bottom: 8,
+                                    trailing: 16
+                                )
+                            )
                         }
                     }
                     .listStyle(.plain)
@@ -38,7 +61,7 @@ struct CarriersResultsView: View {
                     .padding(.bottom, 24)
                 }
             }
-            
+
             if !viewModel.isCarriersListEmpty {
                 NavigationLink {
                     FiltersView(
@@ -82,35 +105,22 @@ struct CarriersResultsView: View {
                 .padding(.bottom, 24)
             }
         }
+        .task {
+            await viewModel.search(
+                fromCode: fromStation.id,
+                toCode: toStation.id
+            )
+        }
         .highPriorityGesture(
             DragGesture(minimumDistance: 20, coordinateSpace: .local)
                 .onEnded { value in
-                    if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                    if value.translation.width > 80
+                        && abs(value.translation.height) < 40
+                    {
                         path.removeLast()
                     }
                 }
         )
     }
-}
 
-struct CarriersResultsView_Previews: PreviewProvider {
-    static var previews: some View {
-        Group {
-            NavigationStack {
-                CarriersResultsView(
-                    routeString: "Москва — Санкт-Петербург",
-                    path: .constant([])
-                )
-            }
-            .preferredColorScheme(.light)
-
-            NavigationStack {
-                CarriersResultsView(
-                    routeString: "Москва — Санкт-Петербург",
-                    path: .constant([])
-                )
-            }
-            .preferredColorScheme(.dark)
-        }
-    }
 }

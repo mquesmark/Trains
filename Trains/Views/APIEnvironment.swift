@@ -14,4 +14,13 @@ final class APIEnvironment {
         
         return StationsRepository(service: service)
     }()
+    
+    lazy private(set) var searchClient: SearchClient = {
+        let client = Client(
+            serverURL: try! Servers.Server1.url(),
+            transport: URLSessionTransport()
+        )
+        let service = SearchService(client: client, apikey: UserInfo.apikey)
+        return SearchClient(service: service)
+    }()
 }

@@ -3,13 +3,18 @@ import SwiftUI
 enum Route: Hashable {
     case cities(PickTarget)
     case stations(PickTarget, city: City)
-    case results(routeString: String)
+    case results(
+        fromCity: City,
+        fromStation: Station,
+        toCity: City,
+        toStation: Station
+    )
     case carrierInfo
     case story(startIndex: Int)
 }
 
 struct MainScreenView: View {
-    
+
     @State private var path: [Route] = []
     @StateObject private var viewModel = MainScreenViewModel()
     private let stationsRepository = APIEnvironment.shared.stationsRepository
@@ -32,7 +37,7 @@ struct MainScreenView: View {
     private var content: some View {
         VStack {
             storiesStrip
-                .frame(height: 188) // Так по макету
+                .frame(height: 188)  // Так по макету
 
             directionView
 
@@ -66,14 +71,18 @@ struct MainScreenView: View {
     private func destination(for route: Route) -> some View {
         switch route {
         case .cities(let target):
-            CitySelectionView(target: target, path: $path, stationsRepository: stationsRepository)
-                .toolbar(.hidden, for: .tabBar)
-                .navigationBarBackButtonHidden(true)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        backButton
-                    }
+            CitySelectionView(
+                target: target,
+                path: $path,
+                stationsRepository: stationsRepository
+            )
+            .toolbar(.hidden, for: .tabBar)
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    backButton
                 }
+            }
 
         case .stations(let target, let city):
             StationSelectionView(
@@ -93,16 +102,21 @@ struct MainScreenView: View {
                     backButton
                 }
             }
-
-        case .results(let routeString):
-            CarriersResultsView(routeString: routeString, path: $path)
-                .toolbar(.hidden, for: .tabBar)
-                .navigationBarBackButtonHidden()
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        backButton
-                    }
+        case .results(let fromCity, let fromStation, let toCity, let toStation):
+            CarriersResultsView(
+                path: $path,
+                fromStation: fromStation,
+                fromCity: fromCity,
+                toStation: toStation,
+                toCity: toCity
+            )
+            .toolbar(.hidden, for: .tabBar)
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    backButton
                 }
+            }
 
         case .carrierInfo:
             CarrierInfoView(carrierName: "")
@@ -126,7 +140,6 @@ struct MainScreenView: View {
         }
     }
 
-    
     private var directionView: some View {
         DirectionView(
             fromCity: $viewModel.fromCity,
@@ -173,8 +186,20 @@ struct MainScreenView: View {
     }
 
     private func searchTapped() {
-        guard let routeString = viewModel.routeString else { return }
-        path.append(.results(routeString: routeString))
+        guard let fromCity = viewModel.fromCity,
+            let fromStation = viewModel.fromStation,
+            let toCity = viewModel.toCity,
+            let toStation = viewModel.toStation
+        else { return }
+
+        path.append(
+            .results(
+                fromCity: fromCity,
+                fromStation: fromStation,
+                toCity: toCity,
+                toStation: toStation
+            )
+        )
     }
 }
 
