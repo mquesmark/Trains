@@ -111,16 +111,21 @@ struct CarriersResultsView: View {
                 toCode: toStation.id
             )
         }
-        .highPriorityGesture(
-            DragGesture(minimumDistance: 20, coordinateSpace: .local)
-                .onEnded { value in
-                    if value.translation.width > 80
-                        && abs(value.translation.height) < 40
-                    {
-                        path.removeLast()
-                    }
-                }
-        )
+        .overlay(alignment: .leading) {
+            Color.clear
+                .frame(width: 24)
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 20, coordinateSpace: .local)
+                        .onEnded { value in
+                            if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                                if !path.isEmpty {
+                                    path.removeLast()
+                                }
+                            }
+                        }
+                )
+        }
     }
 
 }

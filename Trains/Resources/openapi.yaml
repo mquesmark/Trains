@@ -132,6 +132,24 @@ paths:
           required: false
           schema:
             type: string
+        - name: system
+          in: query
+          description: Система кодирования параметров to и from (yandex, iata, sirena, express, esr)
+          required: false
+          schema:
+            type: string
+        - name: show_systems
+          in: query
+          description: Система кодирования, коды которой следует добавить к описанию станций в ответе (yandex, esr)
+          required: false
+          schema:
+            type: string
+        - name: add_days_mask
+          in: query
+          description: Вернуть календарь хождения ниток (false/true)
+          required: false
+          schema:
+            type: boolean
         - name: offset
           in: query
           description: Смещение результатов
@@ -471,6 +489,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Segment'
+        search:
+          $ref: '#/components/schemas/Search'
         interval_segments:
           type: array
           description: Список интервальных рейсов, движение по которым идет регулярно, но без определенного расписания.
@@ -503,6 +523,37 @@ components:
                 description: Признак наличия пересадок по маршруту.
               tickets_info:
                 $ref: '#/components/schemas/TicketsInfo'
+              start_date:
+                type: string
+                description: Дата отправления рейса (YYYY-MM-DD)
+              departure_platform:
+                type: string
+                nullable: true
+                description: Номер платформы станции отправления (null если не указан)
+              arrival_platform:
+                type: string
+                description: Номер платформы станции прибытия (пустая строка если не указана)
+              departure_terminal:
+                type: string
+                nullable: true
+                description: Название терминала станции отправления (null если не указано)
+              arrival_terminal:
+                type: string
+                nullable: true
+                description: Название терминала станции прибытия (null если не указано)
+              stops:
+                type: string
+                description: Станции следования рейса, на которых совершается остановка (свободная форма)
+    Search:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Дата, на которую получен список рейсов (YYYY-MM-DD)
+        from:
+          $ref: '#/components/schemas/Station'
+        to:
+          $ref: '#/components/schemas/Station'
     Copyright:
       type: object
       properties:
@@ -542,11 +593,9 @@ components:
           $ref: '#/components/schemas/Station'
         departure:
           type: string
-          format: date-time
           description: Время отправления
         arrival:
           type: string
-          format: date-time
           description: Время прибытия
         thread:
           $ref: '#/components/schemas/Thread'
@@ -555,6 +604,30 @@ components:
         duration:
           type: integer
           description: Длительность рейса в секундах
+        start_date:
+          type: string
+          description: Дата отправления рейса (YYYY-MM-DD)
+        has_transfers:
+          type: boolean
+          description: Признак наличия пересадок по ходу рейса
+        departure_platform:
+          type: string
+          nullable: true
+          description: Номер платформы станции отправления (null если не указан)
+        arrival_platform:
+          type: string
+          description: Номер платформы станции прибытия (пустая строка если не указана)
+        departure_terminal:
+          type: string
+          nullable: true
+          description: Название терминала станции отправления (null если не указано)
+        arrival_terminal:
+          type: string
+          nullable: true
+          description: Название терминала станции прибытия (null если не указано)
+        stops:
+          type: string
+          description: Станции следования рейса, на которых совершается остановка (свободная форма)
     Pagination:
       type: object
       properties:
@@ -650,11 +723,9 @@ components:
           description: Дни, когда рейс не выполняется
         arrival:
           type: string
-          format: date-time
           description: Время прибытия в формате ISO 8601
         departure:
           type: string
-          format: date-time
           description: Время отправления в формате ISO 8601
         thread:
           $ref: '#/components/schemas/Thread'
@@ -714,6 +785,10 @@ components:
         logo:
           type: string
           description: Ссылка на логотип перевозчика
+        logo_svg:
+          type: string
+          nullable: true
+          description: Ссылка на логотип перевозчика в формате SVG
         email:
           type: string
           description: Электронная почта перевозчика

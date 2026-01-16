@@ -10,6 +10,10 @@ final class CarriersResultsViewModel: ObservableObject {
     @Published var showTransfers: Bool? = nil
 
     @Published private(set) var carriers: [CarrierCardModel] = []
+    // Сохраняем Date для фильтров по времени (индексы совпадают с `carriers`)
+    private(set) var departureDates: [Date?] = []
+    private(set) var arrivalDates: [Date?] = []
+
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorText: String? = nil
 
@@ -34,12 +38,6 @@ final class CarriersResultsViewModel: ObservableObject {
         errorText = nil
         defer { isLoading = false }
         do {
-            let timeFormatter = DateFormatter()
-            timeFormatter.dateFormat = "HH:mm"
-
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd.MM.yyyy"
-            
             let request = try await client.search(
                 fromCode: fromCode,
                 toCode: toCode,
@@ -52,13 +50,37 @@ final class CarriersResultsViewModel: ObservableObject {
             var cards: [CarrierCardModel] = []
             cards.reserveCapacity(segments.count)
             
+            var departureDatesLocal: [Date?] = []
+            var arrivalDatesLocal: [Date?] = []
+            departureDatesLocal.reserveCapacity(segments.count)
+            arrivalDatesLocal.reserveCapacity(segments.count)
+            
             for segment in segments {
                 
-                let departureDate: Date? = segment.departure
-                let arrivalDate: Date? = segment.arrival
-                let dateText = departureDate.map { dateFormatter.string(from: $0) } ?? ""
-                let startTimeText = departureDate.map { timeFormatter.string(from: $0) } ?? ""
-                let endTimeText = arrivalDate.map { timeFormatter.string(from: $0) } ?? ""
+                let departureDate = DateTimeHelpers.parse(segment.departure)
+                let arrivalDate = DateTimeHelpers.parse(segment.arrival)
+
+                // Для UI: в приоритете берём start_date (дата рейса), иначе пытаемся получить дату из departure.
+                let dateText: String = {
+                    if let startDate = segment.start_date, !startDate.isEmpty {
+                        return DateTimeHelpers.prettyDateText(fromYyyyMMdd: startDate)
+                    }
+                    if let dep = departureDate {
+                        return DateTimeHelpers.prettyDateText(from: dep)
+                    }
+                    // если Date не распарсился — попробуем взять YYYY-MM-DD из строки
+                    let raw = DateTimeHelpers.dateTextFallback(from: segment.departure)
+                    return DateTimeHelpers.prettyDateText(fromYyyyMMdd: raw)
+                }()
+
+                let startTimeText = departureDate.map { DateTimeHelpers.timeText(from: $0) }
+                    ?? DateTimeHelpers.timeTextFallback(from: segment.departure)
+
+                let endTimeText = arrivalDate.map { DateTimeHelpers.timeText(from: $0) }
+                    ?? DateTimeHelpers.timeTextFallback(from: segment.arrival)
+
+                departureDatesLocal.append(departureDate)
+                arrivalDatesLocal.append(arrivalDate)
 
                 let duration = segment.duration ?? 0
                 let hours = duration / 3600
@@ -81,6 +103,8 @@ final class CarriersResultsViewModel: ObservableObject {
                 )
                 cards.append(card)
             }
+            self.departureDates = departureDatesLocal
+            self.arrivalDates = arrivalDatesLocal
             self.carriers = cards
         } catch {
             self.errorText = error.localizedDescription

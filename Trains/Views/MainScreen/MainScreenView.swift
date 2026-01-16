@@ -44,7 +44,7 @@ struct MainScreenView: View {
     }
 
     private func resetNavigation() {
-        guard !isResettingNavigation else { return }
+        guard !isResettingNavigation && !path.isEmpty else { return }
 
         // Workaround: NavigationStack + searchable (UISearchController) иногда игнорирует programmatic pop-to-root.
         // Мы форсим пересоздание NavigationStack через .id(...) и делаем короткий fade, чтобы это не выглядело как "телепорт".
