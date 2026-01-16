@@ -1,16 +1,25 @@
 import SwiftUI
 
 struct CitySelectionView: View {
+    @Environment(\.dismissSearch) private var dismissSearch
     let target: PickTarget
     @Binding var path: [Route]
-        
+
     @StateObject private var viewModel: CitySelectionViewModel
-    init(target: PickTarget, path: Binding<[Route]>, stationsRepository: StationsRepository) {
+    init(
+        target: PickTarget,
+        path: Binding<[Route]>,
+        stationsRepository: StationsRepository
+    ) {
         self.target = target
         self._path = path
-        self._viewModel = StateObject(wrappedValue: CitySelectionViewModel(stationsRepository: stationsRepository))
+        self._viewModel = StateObject(
+            wrappedValue: CitySelectionViewModel(
+                stationsRepository: stationsRepository
+            )
+        )
     }
-    
+
     var body: some View {
         Group {
             if viewModel.isLoading {
@@ -36,7 +45,9 @@ struct CitySelectionView: View {
                     }
                     .frame(height: 60)
                     .contentShape(Rectangle())
-                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
+                    .listRowInsets(
+                        EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16)
+                    )
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.backgroundYP)
                     .onTapGesture {
@@ -60,14 +71,18 @@ struct CitySelectionView: View {
         .simultaneousGesture(
             DragGesture(minimumDistance: 20, coordinateSpace: .local)
                 .onEnded { value in
-                    if value.translation.width > 80 && abs(value.translation.height) < 40 && !path.isEmpty {
+                    if value.translation.width > 80
+                        && abs(value.translation.height) < 40 && !path.isEmpty
+                    {
                         path.removeLast()
                     }
                 }
         )
     }
-    
+
     private func didSelectCity(_ city: City) {
+        dismissSearch()
+        viewModel.searchText = ""
         path.append(.stations(target, city: city))
     }
 }

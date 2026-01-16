@@ -16,6 +16,8 @@ enum Route: Hashable {
 struct MainScreenView: View {
 
     @State private var path: [Route] = []
+    @State private var navigationResetToken = UUID()
+    @State private var isResettingNavigation = false
     @StateObject private var viewModel = MainScreenViewModel()
     private let stationsRepository = APIEnvironment.shared.stationsRepository
 
@@ -29,6 +31,36 @@ struct MainScreenView: View {
         }
         .task {
             try? await stationsRepository.loadInfoIfNeeded()
+        }
+        .onChange(of: viewModel.fromStation?.id) { _, _ in
+            resetNavigation()
+        }
+        .onChange(of: viewModel.toStation?.id) { _, _ in
+            resetNavigation()
+        }
+        .id(navigationResetToken)
+        .opacity(isResettingNavigation ? 0 : 1)
+        .animation(.easeInOut(duration: 0.25), value: isResettingNavigation)
+    }
+
+    private func resetNavigation() {
+        guard !isResettingNavigation else { return }
+
+        // Workaround: NavigationStack + searchable (UISearchController) иногда игнорирует programmatic pop-to-root.
+        // Мы форсим пересоздание NavigationStack через .id(...) и делаем короткий fade, чтобы это не выглядело как "телепорт".
+        // Проблема решена при помощи chatgpt
+        isResettingNavigation = true
+
+        // 1) Даем отрисоваться fade-out
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+            // 2) Reset навигации
+            path = []
+            navigationResetToken = UUID()
+
+            // 3) Fade-in в следующий тик, чтобы промежуточный кадр с opacity=0 успел отрисоваться
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
+                isResettingNavigation = false
+            }
         }
     }
 
@@ -201,8 +233,4 @@ struct MainScreenView: View {
             )
         )
     }
-}
-
-#Preview {
-    MainScreenView()
 }

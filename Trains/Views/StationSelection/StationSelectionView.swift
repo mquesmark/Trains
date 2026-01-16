@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct StationSelectionView: View {
-
+    @Environment(\.dismissSearch) private var dismissSearch
+    @Environment(\.dismiss) private var dismiss
     let target: PickTarget
     let city: City
     @Binding var path: [Route]
@@ -29,7 +30,12 @@ struct StationSelectionView: View {
         self._fromStation = fromStation
         self._toCity = toCity
         self._toStation = toStation
-        self._viewModel = StateObject(wrappedValue: StationSelectionViewModel(city: city, stationsRepository: stationsRepository))
+        self._viewModel = StateObject(
+            wrappedValue: StationSelectionViewModel(
+                city: city,
+                stationsRepository: stationsRepository
+            )
+        )
     }
 
     var body: some View {
@@ -63,7 +69,7 @@ struct StationSelectionView: View {
                     )
                     .listRowSeparator(.hidden)
                     .onTapGesture {
-                      didSelectStation(station)
+                        didSelectStation(station)
                     }
                 }
                 .listStyle(.plain)
@@ -83,7 +89,9 @@ struct StationSelectionView: View {
         .simultaneousGesture(
             DragGesture(minimumDistance: 20, coordinateSpace: .local)
                 .onEnded { value in
-                    if value.translation.width > 80 && abs(value.translation.height) < 40 && !path.isEmpty {
+                    if value.translation.width > 80
+                        && abs(value.translation.height) < 40 && !path.isEmpty
+                    {
                         path.removeLast()
                     }
                 }
@@ -94,13 +102,24 @@ struct StationSelectionView: View {
         switch target {
         case .from:
             fromCity = city
-            fromStation = station
+            // Хак: принудительно меняем значение, чтобы onChange сработал даже при выборе той же станции
+            fromStation = nil
+            Task { @MainActor in
+                await Task.yield()
+                fromStation = station
+            }
+
         case .to:
             toCity = city
-            toStation = station
+            // Хак: принудительно меняем значение, чтобы onChange сработал даже при выборе той же станции
+            toStation = nil
+            Task { @MainActor in
+                await Task.yield()
+                toStation = station
+            }
         }
 
-        path.removeAll()
+        dismissSearch()
+        viewModel.searchText = ""
     }
-    
 }
