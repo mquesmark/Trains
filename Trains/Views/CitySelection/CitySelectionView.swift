@@ -4,18 +4,30 @@ struct CitySelectionView: View {
     let target: PickTarget
     @Binding var path: [Route]
         
-    @StateObject private var viewModel = CitySelectionViewModel()
+    @StateObject private var viewModel: CitySelectionViewModel
+    init(target: PickTarget, path: Binding<[Route]>, stationsRepository: StationsRepository) {
+        self.target = target
+        self._path = path
+        self._viewModel = StateObject(wrappedValue: CitySelectionViewModel(stationsRepository: stationsRepository))
+    }
     
     var body: some View {
         Group {
-            if viewModel.isNotFoundState {
+            if viewModel.isLoading {
+                ProgressView("Загрузка городов...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let errorText = viewModel.errorText {
+                Text(errorText)
+                    .font(.system(size: 24, weight: .bold))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if viewModel.isNotFoundState {
                 Text("Город не найден")
                     .font(.system(size: 24, weight: .bold))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                List(viewModel.filteredCities, id: \.self) { city in
+                List(viewModel.filteredCities) { city in
                     HStack {
-                        Text(city)
+                        Text(city.title)
                             .font(.system(size: 17, weight: .regular))
                         Spacer()
                         Image(systemName: "chevron.right")
@@ -42,23 +54,20 @@ struct CitySelectionView: View {
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: "Введите запрос"
         )
+        .task {
+            await viewModel.load()
+        }
         .simultaneousGesture(
             DragGesture(minimumDistance: 20, coordinateSpace: .local)
                 .onEnded { value in
-                    if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                    if value.translation.width > 80 && abs(value.translation.height) < 40 && !path.isEmpty {
                         path.removeLast()
                     }
                 }
         )
     }
     
-    private func didSelectCity(_ city: String) {
-        path.append(.stations(target, city: city))
-    }
-}
-
-#Preview {
-    NavigationStack {
-        CitySelectionView(target: .from, path: .constant([]))
+    private func didSelectCity(_ city: City) {
+        path.append(.stations(target, city: city.title))
     }
 }

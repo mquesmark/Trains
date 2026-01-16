@@ -9,11 +9,10 @@ enum Route: Hashable {
 }
 
 struct MainScreenView: View {
-
+    
     @State private var path: [Route] = []
-    
     @StateObject private var viewModel = MainScreenViewModel()
-    
+    private let stationsRepository = APIEnvironment.shared.stationsRepository
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -64,7 +63,7 @@ struct MainScreenView: View {
     private func destination(for route: Route) -> some View {
         switch route {
         case .cities(let target):
-            CitySelectionView(target: target, path: $path)
+            CitySelectionView(target: target, path: $path, stationsRepository: stationsRepository)
                 .toolbar(.hidden, for: .tabBar)
                 .navigationBarBackButtonHidden(true)
                 .toolbar {
