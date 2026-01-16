@@ -91,7 +91,7 @@ final class CarriersResultsViewModel: ObservableObject {
                 
                 let name = segment.thread?.carrier?.title ?? segment.thread?.title ?? "–"
                 
-                let logo = segment.thread?.carrier?.logo ?? ""
+                let logo = segment.thread?.carrier?.logo ?? segment.thread?.carrier?.logo_svg ?? ""
                 
                 let card = CarrierCardModel(
                     date: dateText,

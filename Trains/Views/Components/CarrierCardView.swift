@@ -29,8 +29,29 @@ struct CarrierCardView: View {
     }
 
     private var logoView: some View {
-        Image(carrier.logo)
+        AsyncImage(url: URL(string: carrier.logo)) { phase in
+            switch phase {
+            case .empty:
+                ProgressView()
+            case .success(let image):
+                image
+                    .resizable()
+                    .scaledToFill()
+            case .failure:
+                Image(systemName: "bus")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.secondary)
+            @unknown default:
+                Image(systemName: "bus")
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundStyle(.secondary)
+            }
+        }
             .frame(width: 38, height: 38)
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private var titleView: some View {
