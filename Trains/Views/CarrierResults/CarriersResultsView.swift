@@ -8,7 +8,7 @@ struct CarriersResultsView: View {
     let toCity: City
 
     var routeString: String {
-        ""
+            return "\(fromCity.title) (\(fromStation.title)) → \(toCity.title) (\(toStation.title))"
     }
 
     @StateObject private var viewModel = CarriersResultsViewModel(

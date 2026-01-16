@@ -15,11 +15,7 @@ final class MainScreenViewModel: ObservableObject {
         fromCity != nil && fromStation != nil && toCity != nil && toStation != nil
     }
     
-    var routeString: String? {
-        guard let fromCity, let fromStation, let toCity, let toStation else { return nil }
-        return "\(fromCity.title) (\(fromStation.title)) → \(toCity.title) (\(toStation.title))"
-
-    }
+  
     
     func swapDirections() {
         swap(&fromCity, &toCity)
