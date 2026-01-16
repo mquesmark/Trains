@@ -6,6 +6,7 @@ import SwiftUI
 struct CarrierCardView: View {
 
     let carrier: CarrierCardModel
+    @State private var isBusPulsing = false
 
     var body: some View {
         VStack(spacing: 18) {
@@ -32,26 +33,41 @@ struct CarrierCardView: View {
         AsyncImage(url: URL(string: carrier.logo)) { phase in
             switch phase {
             case .empty:
-                ProgressView()
+                pulsingBusPlaceholder
+                    .onAppear {
+                        if !isBusPulsing { isBusPulsing = true }
+                    }
             case .success(let image):
                 image
                     .resizable()
                     .scaledToFill()
             case .failure:
-                Image(systemName: "bus")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(.secondary)
+                busPlaceholder
             @unknown default:
-                Image(systemName: "bus")
-                    .resizable()
-                    .scaledToFit()
-                    .foregroundStyle(.secondary)
+                busPlaceholder
             }
         }
             .frame(width: 38, height: 38)
+            .background(Color.blackUniversal.opacity(0.05))
             .clipped()
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var busPlaceholder: some View {
+        Image(systemName: "bus")
+            .resizable()
+            .scaledToFit()
+            .padding(10)
+            .foregroundStyle(Color(.label))
+    }
+
+    private var pulsingBusPlaceholder: some View {
+        busPlaceholder
+            .opacity(isBusPulsing ? 0.45 : 1)
+            .animation(
+                .easeInOut(duration: 0.6).repeatForever(autoreverses: true),
+                value: isBusPulsing
+            )
     }
 
     private var titleView: some View {
@@ -103,7 +119,8 @@ struct CarrierCardView: View {
 
 
 #Preview {
-   let card = CarrierCardModel(date: "14 января", startTime: "22:30", endTime: "08:15", routeTime: "20 часов", logo: "rzd", name: "РЖД")
+    let card = CarrierCardModel(date: "14 января", startTime: "22:30", endTime: "08:15", routeTime: "20 часов", logo: "rzd", name: "РЖД")
+    
     CarrierCardView(carrier: card)
     let card2 = CarrierCardModel(date: "14 января", startTime: "22:30", endTime: "08:15", routeTime: "20 часов", logo: "rzd", name: "РЖД", warningText: "С остановками по пути")
      CarrierCardView(carrier: card2)
