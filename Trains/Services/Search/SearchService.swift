@@ -1,5 +1,6 @@
 import OpenAPIRuntime
 import OpenAPIURLSession
+import Foundation
 
 typealias SearchSegments = Components.Schemas.Segments
 
@@ -16,6 +17,21 @@ protocol SearchServiceProtocol {
         resultTimezone: String?,
         transfers: Bool?
     ) async throws -> SearchSegments
+}
+
+enum APIHTTPError: LocalizedError {
+    case undocumented(statusCode: Int, body: String?)
+
+    var errorDescription: String? {
+        switch self {
+        case let .undocumented(statusCode, body):
+            if let body, !body.isEmpty {
+                return "HTTP \(statusCode): \(body)"
+            } else {
+                return "HTTP \(statusCode)"
+            }
+        }
+    }
 }
 
 final class SearchService: SearchServiceProtocol {
@@ -66,6 +82,27 @@ final class SearchService: SearchServiceProtocol {
                 transfers: transfers
             )
         )
-        return try response.ok.body.json
+        switch response {
+        case let .ok(ok):
+            return try ok.body.json
+
+        case let .undocumented(statusCode, payload):
+            var bodyText: String? = nil
+
+            if let body = payload.body {
+                do {
+                    // OpenAPIRuntime даёт публичный способ «собрать» HTTPBody через init(collecting:upTo:)
+                    let bytes = try await ArraySlice<UInt8>(collecting: body, upTo: 1_000_000)
+                    bodyText = String(decoding: bytes, as: UTF8.self)
+                } catch {
+                    bodyText = "⚠️ cannot read body: \(error)"
+                }
+            }
+
+            print("❌ getScheduleBetweenStations undocumented status:", statusCode)
+            print("📦 body:", bodyText ?? "nil")
+
+            throw APIHTTPError.undocumented(statusCode: statusCode, body: bodyText)
+        }
     }
 }

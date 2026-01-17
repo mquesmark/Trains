@@ -29,7 +29,8 @@ actor StationsRepository {
                 let settlements = region.settlements ?? []
                 for settlement in settlements {
                     guard let cityTitle = settlement.title,
-                        let cityId = settlement.codes?.yandex_code
+                          let cityId = settlement.codes?.yandex_code,
+                          !cityId.isEmpty
                     else { continue }
                     
                     let city = City(id: cityId, title: cityTitle)
@@ -37,7 +38,8 @@ actor StationsRepository {
                     
                     let stations = (settlement.stations ?? []).compactMap { station -> Station? in
                         guard let title = station.title,
-                              let code = station.codes?.yandex_code
+                              let code = station.codes?.yandex_code,
+                              !code.isEmpty
                         else { return nil }
                         return Station(id: code, title: title)
                     }

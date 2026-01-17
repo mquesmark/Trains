@@ -26,9 +26,7 @@ struct CarriersResultsView: View {
                     ProgressView("Загрузка вариантов...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let errorText = viewModel.errorText {
-                    Text(errorText)
-                        .font(.system(size: 24, weight: .bold))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    ErrorScreenView(errorType: .serverError)
                 } else if viewModel.isCarriersListEmpty {
                     Text("Вариантов нет")
                         .font(.system(size: 24, weight: .bold))
