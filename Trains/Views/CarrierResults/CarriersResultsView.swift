@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CarriersResultsView: View {
-    @Binding var path: [Route]
+    @Binding var path: NavigationPath
     let fromStation: Station
     let fromCity: City
     let toStation: Station
@@ -35,7 +35,7 @@ struct CarriersResultsView: View {
                     List {
                         ForEach(viewModel.filteredCarriers) { carrier in
                             Button {
-                                path.append(.carrierInfo)
+                                path.append(Route.carrierInfo)
                             } label: {
                                 CarrierCardView(carrier: carrier)
                                     .contentShape(Rectangle())

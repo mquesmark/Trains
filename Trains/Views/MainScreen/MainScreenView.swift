@@ -15,9 +15,7 @@ enum Route: Hashable {
 
 struct MainScreenView: View {
 
-    @State private var path: [Route] = []
-    @State private var navigationResetToken = UUID()
-    @State private var isResettingNavigation = false
+    @State private var path = NavigationPath()
     @StateObject private var viewModel = MainScreenViewModel()
     private let stationsRepository = APIEnvironment.shared.stationsRepository
 
@@ -31,38 +29,6 @@ struct MainScreenView: View {
         }
         .task {
             try? await stationsRepository.loadInfoIfNeeded()
-        }
-        .onChange(of: viewModel.fromStation?.id) { _, _ in
-            resetNavigation()
-        }
-        .onChange(of: viewModel.toStation?.id) { _, _ in
-            resetNavigation()
-        }
-       .onChange(of: path) { _, newValue in print("path:", newValue) }
-
-        .id(navigationResetToken)
-        .opacity(isResettingNavigation ? 0 : 1)
-        .animation(.easeInOut(duration: 0.25), value: isResettingNavigation)
-    }
-
-    private func resetNavigation() {
-        guard !isResettingNavigation && !path.isEmpty else { return }
-
-        // Workaround: NavigationStack + searchable (UISearchController) иногда игнорирует programmatic pop-to-root.
-        // Мы форсим пересоздание NavigationStack через .id(...) и делаем короткий fade, чтобы это не выглядело как "телепорт".
-        // Проблема решена при помощи chatgpt
-        isResettingNavigation = true
-
-        // 1) Даем отрисоваться fade-out
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
-            // 2) Reset навигации
-            path = []
-            navigationResetToken = UUID()
-
-            // 3) Fade-in в следующий тик, чтобы промежуточный кадр с opacity=0 успел отрисоваться
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
-                isResettingNavigation = false
-            }
         }
     }
 
@@ -90,7 +56,7 @@ struct MainScreenView: View {
                     let storyModel = viewModel.storiesPreview[index]
                     StoryPreviewView(model: storyModel)
                         .onTapGesture {
-                            path.append(.story(startIndex: index))
+                            path.append(Route.story(startIndex: index))
                         }
                 }
             }
@@ -180,8 +146,8 @@ struct MainScreenView: View {
             fromStation: $viewModel.fromStation,
             toCity: $viewModel.toCity,
             toStation: $viewModel.toStation,
-            onFromTap: { path.append(.cities(.from)) },
-            onToTap: { path.append(.cities(.to)) },
+            onFromTap: { path.append(Route.cities(.from)) },
+            onToTap: { path.append(Route.cities(.to)) },
             onSwap: { viewModel.swapDirections() }
         )
         .padding(.init(top: 20, leading: 16, bottom: 16, trailing: 16))
@@ -227,7 +193,7 @@ struct MainScreenView: View {
         else { return }
 
         path.append(
-            .results(
+            Route.results(
                 fromCity: fromCity,
                 fromStation: fromStation,
                 toCity: toCity,

@@ -2,10 +2,9 @@ import SwiftUI
 
 struct StationSelectionView: View {
     @Environment(\.dismissSearch) private var dismissSearch
-    @Environment(\.dismiss) private var dismiss
     let target: PickTarget
     let city: City
-    @Binding var path: [Route]
+    @Binding var path: NavigationPath
     @Binding var fromCity: City?
     @Binding var fromStation: Station?
     @Binding var toCity: City?
@@ -16,7 +15,7 @@ struct StationSelectionView: View {
     init(
         target: PickTarget,
         city: City,
-        path: Binding<[Route]>,
+        path: Binding<NavigationPath>,
         fromCity: Binding<City?>,
         fromStation: Binding<Station?>,
         toCity: Binding<City?>,
@@ -121,5 +120,10 @@ struct StationSelectionView: View {
 
         dismissSearch()
         viewModel.searchText = ""
+        Task { @MainActor in
+            // Даём UI закрыть поиск и применить биндинги, затем возвращаемся на главный экран
+            await Task.yield()
+            path = NavigationPath()
+        }
     }
 }
