@@ -58,7 +58,6 @@ final class CarriersResultsViewModel: ObservableObject {
     func search(
         fromCode: String,
         toCode: String,
-        date: String? = nil,
         offset: Int? = nil,
         limit: Int? = nil,
         transfers: Bool? = true
@@ -67,10 +66,13 @@ final class CarriersResultsViewModel: ObservableObject {
         errorText = nil
         defer { isLoading = false }
         do {
+            let shouldIncludeTransfers = transfers ?? true
+            let effectiveDate: String? = shouldIncludeTransfers ? DateTimeHelpers.todayYyyyMmDd() : nil
+
             let request = try await client.search(
                 fromCode: fromCode,
                 toCode: toCode,
-                date: date,
+                date: effectiveDate,
                 offset: offset,
                 limit: limit,
                 transfers: transfers
@@ -252,5 +254,16 @@ final class CarriersResultsViewModel: ObservableObject {
         }
 
         return nil
+    }
+}
+
+private extension DateTimeHelpers {
+    static func todayYyyyMmDd() -> String {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone.current
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
     }
 }

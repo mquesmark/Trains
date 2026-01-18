@@ -27,7 +27,7 @@ struct CarriersResultsView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let errorText = viewModel.errorText {
                     ErrorScreenView(errorType: .serverError, customText: errorText)
-                } else if viewModel.isCarriersListEmpty {
+                } else if viewModel.filteredCarriers.isEmpty {
                     Text("Вариантов нет")
                         .font(.system(size: 24, weight: .bold))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -60,7 +60,10 @@ struct CarriersResultsView: View {
                 }
             }
 
-            if !viewModel.isCarriersListEmpty {
+            let isDefaultFilters = viewModel.timeSelection.isEmpty && ((viewModel.showTransfers ?? true) == true)
+            let shouldShowFiltersButton = !viewModel.isLoading && viewModel.errorText == nil && (!viewModel.filteredCarriers.isEmpty || !isDefaultFilters)
+
+            if shouldShowFiltersButton {
                 NavigationLink {
                     FiltersView(
                         timeSelection: $viewModel.timeSelection,
@@ -106,8 +109,18 @@ struct CarriersResultsView: View {
         .task {
             await viewModel.search(
                 fromCode: fromStation.id,
-                toCode: toStation.id
+                toCode: toStation.id,
+                transfers: viewModel.showTransfers ?? true
             )
+        }
+        .onChange(of: viewModel.showTransfers) { _, newValue in
+            Task {
+                await viewModel.search(
+                    fromCode: fromStation.id,
+                    toCode: toStation.id,
+                    transfers: newValue ?? true
+                )
+            }
         }
         .overlay(alignment: .leading) {
             Color.clear
