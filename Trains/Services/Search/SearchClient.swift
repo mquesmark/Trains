@@ -7,7 +7,14 @@ actor SearchClient {
         self.service = service
     }
 
-    func search(fromCode: String, toCode: String, date: String? = nil, offset: Int? = nil, limit: Int? = nil) async throws -> SearchSegments {
+    func search(
+        fromCode: String,
+        toCode: String,
+        date: String? = nil,
+        offset: Int? = nil,
+        limit: Int? = nil,
+        transfers: Bool? = true
+    ) async throws -> SearchSegments {
         try await service.getScheduleBetweenStations(
             from: fromCode,
             to: toCode,
@@ -18,7 +25,7 @@ actor SearchClient {
             offset: offset,
             limit: limit,
             resultTimezone: nil,
-            transfers: nil
+            transfers: transfers
         )
     }
 }

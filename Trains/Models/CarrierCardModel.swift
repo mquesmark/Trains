@@ -10,9 +10,9 @@ struct CarrierCardModel: Identifiable {
     let logo: String
     let name: String
     var warningText: String?
-    let hasTransfer: Bool
+    let transferCity: String?
     
-    init(date: String, startTime: String, endTime: String, routeTime: String, logo: String, name: String, warningText: String? = nil, hasTransfer: Bool = false) {
+    init(date: String, startTime: String, endTime: String, routeTime: String, logo: String, name: String, warningText: String? = nil, transferCity: String? = nil) {
         self.date = date
         self.startTime = startTime
         self.endTime = endTime
@@ -20,6 +20,7 @@ struct CarrierCardModel: Identifiable {
         self.logo = logo
         self.name = name
         self.warningText = warningText
-        self.hasTransfer = hasTransfer
+        self.transferCity = transferCity
+        
     }
 }

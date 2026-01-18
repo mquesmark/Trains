@@ -65,8 +65,14 @@ final class SearchService: SearchServiceProtocol {
         offset: Int? = nil,
         limit: Int? = nil,
         resultTimezone: String? = nil,
-        transfers: Bool? = nil
+        transfers: Bool? = true
     ) async throws -> SearchSegments {
+        let effectiveDate: String?
+        if transfers == true {
+            effectiveDate = date ?? Self.todayYyyyMMdd()
+        } else {
+            effectiveDate = nil
+        }
         let response = try await client.getScheduleBetweenStations(
             query: .init(
                 apikey: apikey,
@@ -74,7 +80,7 @@ final class SearchService: SearchServiceProtocol {
                 to: to,
                 format: format,
                 lang: lang,
-                date: date,
+                date: effectiveDate,
                 transport_types: transportTypes,
                 offset: offset,
                 limit: limit,
@@ -105,4 +111,17 @@ final class SearchService: SearchServiceProtocol {
             throw APIHTTPError.undocumented(statusCode: statusCode, body: bodyText)
         }
     }
+
+    private static func todayYyyyMMdd() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
+    }
 }
+
+/*
+ тестовый запрос с пересадкой
+ https://api.rasp.yandex-net.ru/v3.0/search/?apikey=b953018d-b52c-4090-af39-06b69c9096d2&from=s9623131&to=s9606096&format=json&lang=ru_RU&date=2026-01-18&transfers=true&limit=50&offset=0&system=yandex&show_systems=yandex&add_days_mask=true&result_timezone=Europe/Moscow
+*/

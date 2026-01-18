@@ -1,4 +1,4 @@
-enum TimeIntervals: CaseIterable {
+enum TimeIntervals: CaseIterable, Hashable {
     case morning
     case day
     case evening
@@ -10,6 +10,15 @@ enum TimeIntervals: CaseIterable {
         case .day: return "День 12:00 – 18:00"
         case .evening: return "Вечер 18:00 – 00:00"
         case .night: return "Ночь 00:00 – 06:00"
+        }
+    }
+    
+    var range: Range<Int> {
+        switch self {
+        case .morning: return 6..<12
+        case .day: return 12..<18
+        case .evening: return 18..<24
+        case .night: return 0..<6
         }
     }
 }

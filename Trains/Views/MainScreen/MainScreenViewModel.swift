@@ -5,9 +5,12 @@ import Combine
 final class MainScreenViewModel: ObservableObject {
 
     @Published var fromCity: City? = nil
-    @Published var fromStation: Station? = nil
+    @Published var fromStation: Station? = nil { didSet {
+        print(fromStation)
+    }}
     @Published var toCity: City? = nil
-    @Published var toStation: Station? = nil
+    @Published var toStation: Station? = nil { didSet
+        { print(toStation)}}
     
     @Published var storiesPreview: [Story] = Mocks.stories
     
