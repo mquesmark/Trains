@@ -38,6 +38,8 @@ struct MainScreenView: View {
         .onChange(of: viewModel.toStation?.id) { _, _ in
             resetNavigation()
         }
+       .onChange(of: path) { _, newValue in print("path:", newValue) }
+
         .id(navigationResetToken)
         .opacity(isResettingNavigation ? 0 : 1)
         .animation(.easeInOut(duration: 0.25), value: isResettingNavigation)

@@ -107,7 +107,22 @@ final class CarriersResultsViewModel: ObservableObject {
             self.arrivalDates = arrivalDatesLocal
             self.carriers = cards
         } catch {
-            self.errorText = error.localizedDescription
+            // Приводим "сырой" 404 от OpenAPI к понятному сообщению.
+            if let httpError = error as? APIHTTPError {
+                switch httpError {
+                case let .undocumented(statusCode, body):
+                    if statusCode == 404,
+                       let body,
+                       body.contains("Не нашли объект по yandex коду") {
+                        self.errorText = "Яндекс.Расписания не нашли выбранную станцию. Выберите другую."
+                    } else {
+                        self.errorText = httpError.localizedDescription
+                    }
+                }
+            } else {
+                self.errorText = error.localizedDescription
+            }
+
             self.carriers = []
         }
     }
