@@ -111,9 +111,36 @@ final class CarriersResultsViewModel: ObservableObject {
                 departureDatesLocal.append(departureDate)
                 arrivalDatesLocal.append(arrivalDate)
 
-                let duration = Int(segment.duration ?? 0)
-                let hours = duration / 3600
-                let minutes = (duration % 3600) / 60
+                let durationSeconds: Int = {
+                    // 1) Если API отдал duration — используем
+                    if let apiDuration = segment.duration {
+                        return max(0, Int(apiDuration))
+                    }
+
+                    // 2) Fallback: считаем по разнице дат (работает и для пересадок)
+                    if let dep = departureDate, let arr = arrivalDate {
+                        return max(0, Int(arr.timeIntervalSince(dep)))
+                    }
+
+                    // 3) Последний fallback: суммируем duration внутри details
+                    if let details = segment.details {
+                        var sum: Double = 0
+                        for detail in details {
+                            switch detail {
+                            case .JourneySegment(let journey):
+                                sum += journey.duration ?? 0
+                            case .TransferStop(let transferStop):
+                                sum += transferStop.duration ?? 0
+                            }
+                        }
+                        return max(0, Int(sum))
+                    }
+
+                    return 0
+                }()
+
+                let hours = durationSeconds / 3600
+                let minutes = (durationSeconds % 3600) / 60
                 let routeTimeText = hours > 0
                     ? "\(hours)ч \(minutes)м"
                     : "\(minutes)м"
