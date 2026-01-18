@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct CitySelectionView: View {
-    @Environment(\.dismissSearch) private var dismissSearch
     let target: PickTarget
     @Binding var path: NavigationPath
 
@@ -81,7 +80,6 @@ struct CitySelectionView: View {
     }
 
     private func didSelectCity(_ city: City) {
-        dismissSearch()
         viewModel.searchText = ""
         path.append(Route.stations(target, city: city))
     }

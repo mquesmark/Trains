@@ -2,6 +2,7 @@ import SwiftUI
 
 struct StationSelectionView: View {
     @Environment(\.dismissSearch) private var dismissSearch
+    @Environment(\.dismiss) private var dismiss
     let target: PickTarget
     let city: City
     @Binding var path: NavigationPath
@@ -120,8 +121,17 @@ struct StationSelectionView: View {
 
         dismissSearch()
         viewModel.searchText = ""
+
+        // Закрываем текущий экран (станции) и предыдущий (города) вручную.
+        // Вторая попытка dismiss() выполняется на следующем тике, чтобы успело закрыться search.
+        dismiss()
         Task { @MainActor in
-            // Даём UI закрыть поиск и применить биндинги, затем возвращаемся на главный экран
+            await Task.yield()
+            dismiss()
+        }
+
+        // Дополнительно сбрасываем стек навигации на главный экран.
+        Task { @MainActor in
             await Task.yield()
             path = NavigationPath()
         }
