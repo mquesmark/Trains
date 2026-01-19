@@ -8,7 +8,7 @@ final class StoriesViewModel: ObservableObject {
 
     private let stories: [Story]
     private let configuration: StoriesConfiguration
-    private let onStoryShown: (@Sendable (UUID) -> Void)?
+    private let onStoryShown: (@MainActor @Sendable (UUID) -> Void)?
 
     // MARK: - State
 
@@ -36,7 +36,7 @@ final class StoriesViewModel: ObservableObject {
         stories: [Story],
         configuration: StoriesConfiguration,
         startIndex: Int,
-        onStoryShown: (@Sendable (UUID) -> Void)?
+        onStoryShown: (@MainActor @Sendable (UUID) -> Void)?
     ) {
         self.stories = stories
         self.configuration = configuration

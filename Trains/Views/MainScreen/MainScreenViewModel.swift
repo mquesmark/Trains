@@ -31,7 +31,4 @@ final class MainScreenViewModel: ObservableObject {
         }
     }
     
-    func earlyDataLoadRequest() async {
-        try? await stationsRepository.loadInfoIfNeeded()
-    }
 }

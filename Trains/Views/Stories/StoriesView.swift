@@ -5,7 +5,7 @@ struct StoriesView: View {
     // MARK: - Input / Dependencies
 
     private let stories: [Story]
-    private let onStoryShown: (@Sendable (UUID) -> Void)?
+    private let onStoryShown: (@MainActor @Sendable (UUID) -> Void)?
 
     // MARK: - Environment
 
@@ -17,7 +17,7 @@ struct StoriesView: View {
     init(
         stories: [Story] = Mocks.stories,
         startIndex: Int = 0,
-        onStoryShown: (@Sendable (UUID) -> Void)? = nil
+        onStoryShown: (@MainActor @Sendable (UUID) -> Void)? = nil
     ) {
         self.stories = stories
         self.onStoryShown = onStoryShown

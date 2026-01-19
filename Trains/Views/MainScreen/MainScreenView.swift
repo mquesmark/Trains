@@ -34,9 +34,6 @@ struct MainScreenView: View {
                     destination(for: route)
                 }
         }
-        .task(priority: .high) {
-            await viewModel.earlyDataLoadRequest()
-        }
     }
 
     // MARK: - Content
