@@ -54,22 +54,23 @@ struct CarrierCardView: View {
     }
 
     private var busPlaceholder: some View {
+        Image(systemName: "bus.doubledecker")
+            .resizable()
+            .scaledToFit()
+            .padding(10)
+            .foregroundStyle(Color(.blueUniversal))
+    }
+
+    private var pulsingBusPlaceholder: some View {
         Image(systemName: "bus")
             .resizable()
             .scaledToFit()
             .padding(10)
-            .foregroundStyle(Color(.label))
-    }
+            .foregroundStyle(Color(.blackUniversal).opacity(0.95))
+            .shimmer(duration: 2, bandSize: 0.5, highlightOpacity: 0.75, blur: 7)
 
-    private var pulsingBusPlaceholder: some View {
-        busPlaceholder
-            .opacity(isBusPulsing ? 0.45 : 1)
-            .animation(
-                .easeInOut(duration: 0.6).repeatForever(autoreverses: true),
-                value: isBusPulsing
-            )
     }
-
+    
     private var titleView: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(carrier.carrierInfo.name)
