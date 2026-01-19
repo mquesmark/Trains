@@ -106,21 +106,12 @@ struct CarriersResultsView: View {
                 .padding(.bottom, 24)
             }
         }
-        .task {
+        .task(id: "\(fromStation.id)|\(toStation.id)|\((viewModel.showTransfers ?? true) ? 1 : 0)") {
             await viewModel.search(
                 fromCode: fromStation.id,
                 toCode: toStation.id,
                 transfers: viewModel.showTransfers ?? true
             )
-        }
-        .onChange(of: viewModel.showTransfers) { _, newValue in
-            Task {
-                await viewModel.search(
-                    fromCode: fromStation.id,
-                    toCode: toStation.id,
-                    transfers: newValue ?? true
-                )
-            }
         }
         .overlay(alignment: .leading) {
             Color.clear

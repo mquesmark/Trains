@@ -6,14 +6,15 @@ actor StationsRepository {
     private var isLoaded: Bool = false
     private var citiesCache: [City] = []
     private var stationsByCityIdDict: [String: [Station]] = [:]
-
+    private var isLoading: Bool = false
     init(service: StationsListServiceProtocol) {
         self.service = service
     }
 
     func loadInfoIfNeeded() async throws {
-        guard !isLoaded else { return }
-
+        guard !isLoaded && !isLoading else { return }
+        isLoading = true
+        defer { isLoading = false }
         let response = try await service.getAllStations(
             lang: "ru_RU",
             format: "json"
@@ -56,7 +57,7 @@ actor StationsRepository {
         self.isLoaded = true
     }
 
-    func getCities() -> [City] { return citiesCache }
+    func getCities() async -> [City] { return citiesCache }
     
-    func getStations(forCityWithId cityId: String) -> [Station] { stationsByCityIdDict[cityId] ?? [] }
+    func getStations(forCityWithId cityId: String) async -> [Station] { stationsByCityIdDict[cityId] ?? [] }
 }

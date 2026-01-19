@@ -4,7 +4,7 @@ import Foundation
 
 typealias SearchSegments = Components.Schemas.Segments
 
-protocol SearchServiceProtocol {
+protocol SearchServiceProtocol: Sendable {
     func getScheduleBetweenStations(
         from: String,
         to: String,
@@ -34,7 +34,7 @@ enum APIHTTPError: LocalizedError {
     }
 }
 
-final class SearchService: SearchServiceProtocol {
+final class SearchService: SearchServiceProtocol, Sendable {
     private let client: Client
     private let apikey: String
 

@@ -1,4 +1,4 @@
-enum TimeIntervals: CaseIterable, Hashable {
+enum TimeIntervals: CaseIterable, Hashable, Sendable {
     case morning
     case day
     case evening

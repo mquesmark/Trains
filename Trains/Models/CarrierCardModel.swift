@@ -1,6 +1,6 @@
 import Foundation
 
-struct CarrierCardModel: Identifiable {
+struct CarrierCardModel: Identifiable, Sendable {
     let id = UUID()
     
     let date: String

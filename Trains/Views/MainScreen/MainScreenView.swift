@@ -16,8 +16,15 @@ enum Route: Hashable {
 struct MainScreenView: View {
 
     @State private var path = NavigationPath()
-    @StateObject private var viewModel = MainScreenViewModel()
-    private let stationsRepository = APIEnvironment.shared.stationsRepository
+    private let stationsRepository: StationsRepository
+    @StateObject private var viewModel: MainScreenViewModel
+
+    init(stationsRepository: StationsRepository = APIEnvironment.shared.stationsRepository) {
+        _viewModel = StateObject(
+            wrappedValue: MainScreenViewModel(stationsRepository: stationsRepository)
+        )
+        self.stationsRepository = stationsRepository
+    }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -27,8 +34,8 @@ struct MainScreenView: View {
                     destination(for: route)
                 }
         }
-        .task {
-            try? await stationsRepository.loadInfoIfNeeded()
+        .task(priority: .high) {
+            await viewModel.earlyDataLoadRequest()
         }
     }
 

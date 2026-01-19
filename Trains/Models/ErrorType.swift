@@ -3,7 +3,7 @@ enum ErrorType {
     case noInternet
 }
 
-extension ErrorType: Identifiable {
+extension ErrorType: Identifiable, Sendable {
     var id: String {
         switch self {
         case .serverError: return "serverError"

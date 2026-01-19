@@ -1,4 +1,4 @@
-struct CarrierInfo: Hashable {
+struct CarrierInfo: Hashable, Sendable {
     let code: Int?
     let logoUrlString: String
     let name: String
