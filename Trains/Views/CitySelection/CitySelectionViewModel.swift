@@ -38,13 +38,13 @@ final class CitySelectionViewModel: ObservableObject {
     }
 
     func load() async {
+        guard !isLoading else { return }
         isLoading = true
         errorText = nil
         defer { isLoading = false }
 
         do {
-            try await stationsRepository.loadInfoIfNeeded()
-            cities = await stationsRepository.getCities()
+            cities = try await stationsRepository.getCities()
             // Быстро показываем полный список сразу после загрузки
             filteredCities = cities
             // Актуализируем фильтр для уже введённого текста (если он есть)

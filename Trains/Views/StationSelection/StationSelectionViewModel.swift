@@ -47,8 +47,7 @@ final class StationSelectionViewModel: ObservableObject {
             isLoading = false
         }
         do {
-            try await stationsRepository.loadInfoIfNeeded()
-            stations = await stationsRepository.getStations(forCityWithId: city.id)
+            stations = try await stationsRepository.getStations(forCityWithId: city.id)
             // Быстро показываем полный список сразу после загрузки
             filteredStations = stations
             // Актуализируем фильтр для уже введённого текста (если он есть)

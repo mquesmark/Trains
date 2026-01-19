@@ -53,7 +53,7 @@ struct CitySelectionView: View {
                         didSelectCity(city)
                     }
                 }
-                .animation(.easeInOut(duration: 0.2), value: viewModel.filteredCities)
+                .animation(.easeInOut(duration: 0.15), value: viewModel.filteredCities)
                 .listStyle(.plain)
             }
         }

@@ -11,7 +11,7 @@ actor StationsRepository {
         self.service = service
     }
 
-    func loadInfoIfNeeded() async throws {
+    private func loadInfoIfNeeded() async throws {
         guard !isLoaded && !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
@@ -57,7 +57,13 @@ actor StationsRepository {
         self.isLoaded = true
     }
 
-    func getCities() async -> [City] { return citiesCache }
-    
-    func getStations(forCityWithId cityId: String) async -> [Station] { stationsByCityIdDict[cityId] ?? [] }
+    func getCities() async throws -> [City] {
+        try await loadInfoIfNeeded()
+        return citiesCache
+    }
+
+    func getStations(forCityWithId cityId: String) async throws -> [Station] {
+        try await loadInfoIfNeeded()
+        return stationsByCityIdDict[cityId] ?? []
+    }
 }
