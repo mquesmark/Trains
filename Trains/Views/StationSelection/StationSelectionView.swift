@@ -72,6 +72,7 @@ struct StationSelectionView: View {
                         didSelectStation(station)
                     }
                 }
+                .animation(.easeInOut(duration: 0.2), value: viewModel.filteredStations)
                 .listStyle(.plain)
             }
         }

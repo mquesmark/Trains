@@ -35,7 +35,7 @@ struct CarriersResultsView: View {
                     List {
                         ForEach(viewModel.filteredCarriers) { carrier in
                             Button {
-                                path.append(Route.carrierInfo)
+                                path.append(Route.carrierInfo(carrier.carrierInfo))
                             } label: {
                                 CarrierCardView(carrier: carrier)
                                     .contentShape(Rectangle())

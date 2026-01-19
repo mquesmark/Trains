@@ -1,13 +1,11 @@
-import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class CarrierInfoViewModel: ObservableObject {
-    @Published var carrierName: String
-    @Published var carrierInfo: CarrierInfo = Mocks.carrierInfo
-    
-    init(carrierName: String) {
-        self.carrierName = carrierName
+    @Published var carrierInfo: CarrierInfo
+
+    init(carrierInfo: CarrierInfo) {
+        self.carrierInfo = carrierInfo
     }
-    
 }

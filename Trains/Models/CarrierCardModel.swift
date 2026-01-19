@@ -12,7 +12,9 @@ struct CarrierCardModel: Identifiable {
     var warningText: String?
     let transferCity: String?
     
-    init(date: String, startTime: String, endTime: String, routeTime: String, logo: String, name: String, warningText: String? = nil, transferCity: String? = nil) {
+    let carrierInfo: CarrierInfo
+    
+    init(date: String, startTime: String, endTime: String, routeTime: String, logo: String, name: String, warningText: String? = nil, transferCity: String? = nil, carrierInfo: CarrierInfo = Mocks.carrierInfo) {
         self.date = date
         self.startTime = startTime
         self.endTime = endTime
@@ -21,6 +23,6 @@ struct CarrierCardModel: Identifiable {
         self.name = name
         self.warningText = warningText
         self.transferCity = transferCity
-        
+        self.carrierInfo = carrierInfo
     }
 }

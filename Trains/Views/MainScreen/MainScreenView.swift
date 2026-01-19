@@ -9,7 +9,7 @@ enum Route: Hashable {
         toCity: City,
         toStation: Station
     )
-    case carrierInfo
+    case carrierInfo(CarrierInfo)
     case story(startIndex: Int)
 }
 
@@ -118,8 +118,8 @@ struct MainScreenView: View {
                 }
             }
 
-        case .carrierInfo:
-            CarrierInfoView(carrierName: "")
+        case .carrierInfo(let carrierInfo):
+            CarrierInfoView(carrierInfo: carrierInfo)
                 .navigationBarBackButtonHidden()
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
