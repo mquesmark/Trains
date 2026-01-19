@@ -1,6 +1,7 @@
 import SwiftUI
 import Combine
 
+@MainActor
 final class AppErrorState: ObservableObject {
     @Published var error: ErrorType? = nil
 }
