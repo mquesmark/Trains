@@ -40,7 +40,27 @@ enum DateTimeHelpers {
         if let d = isoNoFractional.date(from: value) { return d }
         return legacy.date(from: value)
     }
+    
+    static func parse(_ value: String?, baseDateYyyyMmDd: String?) -> Date? {
+        // 1) сначала старый parse
+        if let d = parse(value) { return d }
 
+        // 2) если это time-only — склеиваем с baseDate
+        guard
+            let raw = value, !raw.isEmpty,
+            let base = baseDateYyyyMmDd, base.count == 10
+        else { return nil }
+
+        // raw: "HH:mm" или "HH:mm:ss"
+        let parts = raw.split(separator: ":")
+        guard parts.count >= 2 else { return nil }
+
+        let hh = parts[0], mm = parts[1]
+        let ss = parts.count >= 3 ? parts[2] : "00"
+
+        return legacy.date(from: "\(base) \(hh):\(mm):\(ss)")
+    }
+    
     // MARK: - UI formatters
 
     private static let yyyyMMdd: DateFormatter = {

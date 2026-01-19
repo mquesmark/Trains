@@ -7,12 +7,9 @@ final class CarriersResultsViewModel: ObservableObject {
     private let client: SearchClient
 
     @Published var timeSelection: Set<TimeIntervals> = []
-    @Published var showTransfers: Bool? = true
+    @Published var showTransfers: Bool = true
 
     @Published private(set) var carriers: [CarrierCardModel] = []
-    // Сохраняем Date для фильтров по времени (индексы совпадают с `carriers`)
-    private(set) var departureDates: [Date?] = []
-    private(set) var arrivalDates: [Date?] = []
 
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorText: String? = nil
@@ -24,28 +21,18 @@ final class CarriersResultsViewModel: ObservableObject {
     var filteredCarriers: [CarrierCardModel] {
         var result = carriers
 
-        // Фильтр пересадок
-        // showTransfers == true  -> показываем ВСЕ варианты (включая пересадки)
-        // showTransfers == false -> показываем только БЕЗ пересадок
-        // nil -> без фильтра
-        if let showTransfers = showTransfers {
             if showTransfers == false {
                 result = result.filter { $0.warningText == nil }
             }
-        }
+        
 
         // Фильтр по времени (если выбран)
         if !timeSelection.isEmpty {
-            result = result.enumerated().filter { index, _ in
-                guard index < departureDates.count else { return true }
-                guard let date = departureDates[index] else { return true }
+            result = result.filter { carrier in
+                guard let date = carrier.departureDate else { return false }
                 let hour = Calendar.current.component(.hour, from: date)
-
-                for interval in timeSelection {
-                    if interval.range.contains(hour) { return true }
-                }
-                return false
-            }.map { $0.element }
+                return timeSelection.contains { $0.range.contains(hour) }
+            }
         }
 
         return result
@@ -82,16 +69,25 @@ final class CarriersResultsViewModel: ObservableObject {
             var cards: [CarrierCardModel] = []
             cards.reserveCapacity(segments.count)
 
-            var departureDatesLocal: [Date?] = []
-            var arrivalDatesLocal: [Date?] = []
-            departureDatesLocal.reserveCapacity(segments.count)
-            arrivalDatesLocal.reserveCapacity(segments.count)
-
             for segment in segments {
+                let baseDate = (segment.start_date?.isEmpty == false ? segment.start_date : nil)
+                ?? effectiveDate
 
-                let departureDate = DateTimeHelpers.parse(segment.departure)
-                let arrivalDate = DateTimeHelpers.parse(segment.arrival)
+                let departureDate = DateTimeHelpers.parse(segment.departure, baseDateYyyyMmDd: baseDate)
 
+                let arrivalDateRaw = DateTimeHelpers.parse(segment.arrival, baseDateYyyyMmDd: baseDate)
+                let arrivalDate: Date? = {
+                    guard let dep = departureDate, let arr = arrivalDateRaw else { return arrivalDateRaw }
+                    if arr < dep {
+                        return Calendar.current.date(byAdding: .day, value: 1, to: arr)
+                    }
+                    return arr
+                }()
+
+                if departureDate == nil || arrivalDateRaw == nil {
+                    print("PARSE FAIL departure:", segment.departure ?? "nil", "arrival:", segment.arrival ?? "nil")
+                }
+                
                 let dateText: String = {
                     if let startDate = segment.start_date, !startDate.isEmpty {
                         return DateTimeHelpers.prettyDateText(fromYyyyMMdd: startDate)
@@ -108,9 +104,6 @@ final class CarriersResultsViewModel: ObservableObject {
 
                 let endTimeText = arrivalDate.map { DateTimeHelpers.timeText(from: $0) }
                     ?? DateTimeHelpers.timeTextFallback(from: segment.arrival)
-
-                departureDatesLocal.append(departureDate)
-                arrivalDatesLocal.append(arrivalDate)
 
                 let durationSeconds: Int = {
                     // 1) Если API отдал duration — используем
@@ -164,6 +157,8 @@ final class CarriersResultsViewModel: ObservableObject {
                 }()
 
                 let card = CarrierCardModel(
+                    departureDate: departureDate,
+                    arrivalDate: arrivalDate,
                     date: dateText,
                     startTime: startTimeText,
                     endTime: endTimeText,
@@ -175,9 +170,6 @@ final class CarriersResultsViewModel: ObservableObject {
 
                 cards.append(card)
             }
-
-            self.departureDates = departureDatesLocal
-            self.arrivalDates = arrivalDatesLocal
             self.carriers = cards
         } catch {
             // Приводим "сырой" 404 от OpenAPI к понятному сообщению.

@@ -60,7 +60,7 @@ struct CarriersResultsView: View {
                 }
             }
 
-            let isDefaultFilters = viewModel.timeSelection.isEmpty && ((viewModel.showTransfers ?? true) == true)
+            let isDefaultFilters = viewModel.timeSelection.isEmpty && ((viewModel.showTransfers) == true)
             let shouldShowFiltersButton = !viewModel.isLoading && viewModel.errorText == nil && (!viewModel.filteredCarriers.isEmpty || !isDefaultFilters)
 
             if shouldShowFiltersButton {
@@ -106,11 +106,11 @@ struct CarriersResultsView: View {
                 .padding(.bottom, 24)
             }
         }
-        .task(id: "\(fromStation.id)|\(toStation.id)|\((viewModel.showTransfers ?? true) ? 1 : 0)") {
+        .task(id: "\(fromStation.id)|\(toStation.id)|\((viewModel.showTransfers) ? 1 : 0)") {
             await viewModel.search(
                 fromCode: fromStation.id,
                 toCode: toStation.id,
-                transfers: viewModel.showTransfers ?? true
+                transfers: viewModel.showTransfers
             )
         }
         .overlay(alignment: .leading) {

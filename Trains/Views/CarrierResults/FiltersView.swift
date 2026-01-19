@@ -13,18 +13,18 @@ struct FiltersView: View {
     // MARK: - Bindings
 
     @Binding var timeSelection: Set<TimeIntervals>
-    @Binding var showTransfers: Bool?
+    @Binding var showTransfers: Bool
 
     // MARK: - Draft State
 
     @State private var draftTimeSelection: Set<TimeIntervals>
-    @State private var draftShowTransfers: Bool?
+    @State private var draftShowTransfers: Bool
 
     // MARK: - Init
 
     init(
         timeSelection: Binding<Set<TimeIntervals>>,
-        showTransfers: Binding<Bool?>
+        showTransfers: Binding<Bool>
     ) {
         self._timeSelection = timeSelection
         self._showTransfers = showTransfers
