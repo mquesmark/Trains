@@ -22,7 +22,6 @@ struct CarrierInfoView: View {
                 case .empty:
                     ZStack {
                         Color.black.opacity(0.05)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
                         ProgressView()
                     }
                 case .success(let image):
@@ -33,8 +32,10 @@ struct CarrierInfoView: View {
                     EmptyView()
                 }
             }
+            .clipShape(RoundedRectangle(cornerRadius: 24))
             .frame(height: 100)
             .frame(maxWidth: .infinity)
+
             
             Text(viewModel.carrierInfo.name)
                 .font(.system(size: 24, weight: .bold))
