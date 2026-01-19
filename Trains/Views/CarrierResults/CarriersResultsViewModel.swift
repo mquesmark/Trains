@@ -29,12 +29,18 @@ final class CarriersResultsViewModel: ObservableObject {
         // Фильтр по времени (если выбран)
         if !timeSelection.isEmpty {
             result = result.filter { carrier in
-                guard let date = carrier.departureDate else { return false }
+                let date = carrier.departureDate
                 let hour = Calendar.current.component(.hour, from: date)
                 return timeSelection.contains { $0.range.contains(hour) }
             }
         }
-
+        
+        result.sort { // Сортируем результаты по возрастанию даты
+            if $0.departureDate != $1.departureDate {
+                return $0.departureDate < $1.departureDate
+            }
+            return $0.arrivalDate < $1.arrivalDate // на случай, если время отправления одинаковое
+        }
         return result
     }
 
@@ -84,26 +90,21 @@ final class CarriersResultsViewModel: ObservableObject {
                     return arr
                 }()
 
-                if departureDate == nil || arrivalDateRaw == nil {
+                guard let departureDate, let arrivalDate else {
                     print("PARSE FAIL departure:", segment.departure ?? "nil", "arrival:", segment.arrival ?? "nil")
+                    continue
                 }
                 
                 let dateText: String = {
                     if let startDate = segment.start_date, !startDate.isEmpty {
                         return DateTimeHelpers.prettyDateText(fromYyyyMMdd: startDate)
                     }
-                    if let dep = departureDate {
-                        return DateTimeHelpers.prettyDateText(from: dep)
-                    }
-                    let raw = DateTimeHelpers.dateTextFallback(from: segment.departure)
-                    return DateTimeHelpers.prettyDateText(fromYyyyMMdd: raw)
+                    return DateTimeHelpers.prettyDateText(from: departureDate)
                 }()
 
-                let startTimeText = departureDate.map { DateTimeHelpers.timeText(from: $0) }
-                    ?? DateTimeHelpers.timeTextFallback(from: segment.departure)
+                let startTimeText = DateTimeHelpers.timeText(from: departureDate)
 
-                let endTimeText = arrivalDate.map { DateTimeHelpers.timeText(from: $0) }
-                    ?? DateTimeHelpers.timeTextFallback(from: segment.arrival)
+                let endTimeText = DateTimeHelpers.timeText(from: arrivalDate)
 
                 let durationSeconds: Int = {
                     // 1) Если API отдал duration — используем
@@ -111,26 +112,8 @@ final class CarriersResultsViewModel: ObservableObject {
                         return max(0, Int(apiDuration))
                     }
 
-                    // 2) Fallback: считаем по разнице дат (работает и для пересадок)
-                    if let dep = departureDate, let arr = arrivalDate {
-                        return max(0, Int(arr.timeIntervalSince(dep)))
-                    }
-
-                    // 3) Последний fallback: суммируем duration внутри details
-                    if let details = segment.details {
-                        var sum: Double = 0
-                        for detail in details {
-                            switch detail {
-                            case .JourneySegment(let journey):
-                                sum += journey.duration ?? 0
-                            case .TransferStop(let transferStop):
-                                sum += transferStop.duration ?? 0
-                            }
-                        }
-                        return max(0, Int(sum))
-                    }
-
-                    return 0
+                    // 2) Fallback: считаем по разнице дат
+                    return max(0, Int(arrivalDate.timeIntervalSince(departureDate)))
                 }()
 
                 let hours = durationSeconds / 3600
