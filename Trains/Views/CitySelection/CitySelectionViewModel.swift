@@ -18,7 +18,7 @@ final class CitySelectionViewModel: ObservableObject {
 
         // Делаем debounce на main (UI), а саму фильтрацию — в фоне, чтобы не фризить список
         $searchText
-            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
+            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .removeDuplicates()
             // Снимаем "снимок" городов на main, чтобы дальше безопасно фильтровать в фоне
             .map { [weak self] text -> (String, [City]) in

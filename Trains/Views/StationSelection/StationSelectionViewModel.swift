@@ -21,7 +21,7 @@ final class StationSelectionViewModel: ObservableObject {
 
         // Debounce на main (UI), фильтрация — в фоне, чтобы не фризить список
         $searchText
-            .debounce(for: .seconds(0.3), scheduler: RunLoop.main)
+            .debounce(for: .seconds(0.2), scheduler: RunLoop.main)
             .removeDuplicates()
             // Снимаем "снимок" станций на main, чтобы дальше безопасно фильтровать в фоне
             .map { [weak self] text -> (String, [Station]) in
