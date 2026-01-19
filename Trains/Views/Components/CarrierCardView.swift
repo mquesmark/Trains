@@ -30,7 +30,7 @@ struct CarrierCardView: View {
     }
 
     private var logoView: some View {
-        AsyncImage(url: URL(string: carrier.logo)) { phase in
+        AsyncImage(url: URL(string: carrier.carrierInfo.logoUrlString)) { phase in
             switch phase {
             case .empty:
                 pulsingBusPlaceholder
@@ -72,7 +72,7 @@ struct CarrierCardView: View {
 
     private var titleView: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(carrier.name)
+            Text(carrier.carrierInfo.name)
             if let warningText = carrier.warningText {
                 Text(warningText)
                     .font(.system(size: 12))
@@ -115,13 +115,4 @@ struct CarrierCardView: View {
         RoundedRectangle(cornerRadius: 24)
             .fill(Color.lightGrayYP)
     }
-}
-
-
-#Preview {
-    let card = CarrierCardModel(date: "14 января", startTime: "22:30", endTime: "08:15", routeTime: "20 часов", logo: "rzd", name: "РЖД")
-    
-    CarrierCardView(carrier: card)
-    let card2 = CarrierCardModel(date: "14 января", startTime: "22:30", endTime: "08:15", routeTime: "20 часов", logo: "rzd", name: "РЖД", warningText: "С остановками по пути")
-     CarrierCardView(carrier: card2)
 }

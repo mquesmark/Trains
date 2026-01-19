@@ -17,7 +17,7 @@ struct CarrierInfoView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            AsyncImage(url: URL(string: viewModel.carrierInfo.imageUrlString)) { phase in
+            AsyncImage(url: URL(string: viewModel.carrierInfo.logoUrlString)) { phase in
                 switch phase {
                 case .empty:
                     ZStack {
@@ -78,40 +78,4 @@ struct CarrierInfoView: View {
     }
     
     
-}
-
-#Preview("Success") {
-    CarrierInfoView(
-        carrierInfo: CarrierInfo(
-            code: "",
-            imageUrlString: "https://upload.wikimedia.org/wikipedia/commons/b/b8/RZD.svg",
-            name: "РЖД",
-            email: "info@rzd.ru",
-            phone: "+7 800 775-00-00"
-        )
-    )
-}
-
-#Preview("Loading") {
-    CarrierInfoView(
-        carrierInfo: CarrierInfo(
-            code: "",
-            imageUrlString: "https://example.com/loading.png", // долго грузится
-            name: "Загружается...",
-            email: "",
-            phone: ""
-        )
-    )
-}
-
-#Preview("Failure") {
-    CarrierInfoView(
-        carrierInfo: CarrierInfo(
-            code: "",
-            imageUrlString: "https://example.com/404.png", // гарантированный фейл
-            name: "Перевозчик",
-            email: "—",
-            phone: "—"
-        )
-    )
 }

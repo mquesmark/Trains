@@ -79,7 +79,6 @@ final class CarriersResultsViewModel: ObservableObject {
             )
 
             let segments = request.segments ?? []
-            print("✅ search: segments=\(segments.count)")
             var cards: [CarrierCardModel] = []
             cards.reserveCapacity(segments.count)
 
@@ -147,8 +146,7 @@ final class CarriersResultsViewModel: ObservableObject {
                     ? "\(hours)ч \(minutes)м"
                     : "\(minutes)м"
 
-                // Имя и логотип перевозчика
-                let (name, logo) = extractCarrierPresentation(from: segment)
+                let carriersInfo = extractCarrierPresentation(from: segment)
 
                 // Пересадка: город берём из `transfers`, а если нет — из `details` (TransferStop)
                 let transferCity = extractTransferCity(from: segment)
@@ -170,10 +168,9 @@ final class CarriersResultsViewModel: ObservableObject {
                     startTime: startTimeText,
                     endTime: endTimeText,
                     routeTime: routeTimeText,
-                    logo: logo,
-                    name: name,
                     warningText: warningText,
-                    transferCity: transferCity
+                    transferCity: transferCity,
+                    carrierInfo: carriersInfo
                 )
 
                 cards.append(card)
@@ -205,13 +202,16 @@ final class CarriersResultsViewModel: ObservableObject {
 
     // MARK: - Transfers helpers
 
-    private func extractCarrierPresentation(from segment: Components.Schemas.Segment) -> (name: String, logo: String) {
+    private func extractCarrierPresentation(from segment: Components.Schemas.Segment) -> CarrierInfo {
         // Прямой маршрут
         if segment.has_transfers != true {
             let carrier = segment.thread?.carrier
-            let name = carrier?.title ?? "Неизвестный перевозчик"
+            let code = carrier?.code
+            let name = carrier?.title ?? ""
             let logo = carrier?.logo ?? carrier?.logo_svg ?? ""
-            return (name, logo)
+            let email = carrier?.email ?? ""
+            let phone = carrier?.phone ?? ""
+            return CarrierInfo(code: code, logoUrlString: logo, name: name, email: email, phone: phone)
         }
 
         // Маршрут с пересадками: берём перевозчика первого JourneySegment, если получится
@@ -219,14 +219,17 @@ final class CarriersResultsViewModel: ObservableObject {
             for detail in details {
                 if case .JourneySegment(let journey) = detail {
                     let carrier = journey.thread?.carrier
+                    let code = carrier?.code
                     let name = carrier?.title ?? "Несколько перевозчиков"
                     let logo = carrier?.logo ?? carrier?.logo_svg ?? ""
-                    return (name, logo)
+                    let email = carrier?.email ?? ""
+                    let phone = carrier?.phone ?? ""
+                    return CarrierInfo(code: code, logoUrlString: logo, name: name, email: email, phone: phone)
                 }
             }
         }
 
-        return ("Несколько перевозчиков", "")
+        return CarrierInfo(code: nil, logoUrlString: "", name: "Несколько перевозчиков", email: "", phone: "")
     }
 
     private func extractTransferCity(from segment: Components.Schemas.Segment) -> String? {
