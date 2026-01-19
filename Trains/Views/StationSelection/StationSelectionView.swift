@@ -13,6 +13,8 @@ struct StationSelectionView: View {
 
     @StateObject private var viewModel: StationSelectionViewModel
 
+    @State private var dismissStage: Int = 0
+
     init(
         target: PickTarget,
         city: City,
@@ -82,6 +84,9 @@ struct StationSelectionView: View {
         .task {
             await viewModel.load()
         }
+        .task(id: dismissStage) {
+            await runDismissStageIfNeeded()
+        }
         .searchable(
             text: $viewModel.searchText,
             placement: .navigationBarDrawer(displayMode: .always),
@@ -103,38 +108,53 @@ struct StationSelectionView: View {
         switch target {
         case .from:
             fromCity = city
-            // Хак: принудительно меняем значение, чтобы onChange сработал даже при выборе той же станции
-            fromStation = nil
-            Task { @MainActor in
-                await Task.yield()
-                fromStation = station
-            }
+            fromStation = station
 
         case .to:
             toCity = city
-            // Хак: принудительно меняем значение, чтобы onChange сработал даже при выборе той же станции
-            toStation = nil
-            Task { @MainActor in
-                await Task.yield()
-                toStation = station
-            }
+            toStation = station
         }
 
         dismissSearch()
         viewModel.searchText = ""
 
-        // Закрываем текущий экран (станции) и предыдущий (города) вручную.
-        // Вторая попытка dismiss() выполняется на следующем тике, чтобы успело закрыться search.
-        dismiss()
-        Task { @MainActor in
-            await Task.yield()
-            dismiss()
-        }
+        // Запускаем staged-dismiss flow (workaround бага навигации).
+        // Этап 1: dismiss, затем переключение на этап 2.
+        // Этап 2: второй dismiss, затем сброс стека навигации.
+        dismissStage = 1
+    }
 
-        // Дополнительно сбрасываем стек навигации на главный экран.
-        Task { @MainActor in
+    private func runDismissStageIfNeeded() async {
+        guard dismissStage != 0 else { return }
+
+        switch dismissStage {
+        case 1:
+            // Первый dismiss
+            await MainActor.run {
+                dismiss()
+            }
+
+            // Переключаемся на этап 2 на следующем тике
             await Task.yield()
-            path = NavigationPath()
+            await MainActor.run {
+                dismissStage = 2
+            }
+
+        case 2:
+            // Второй dismiss
+            await MainActor.run {
+                dismiss()
+            }
+
+            // После второго dismiss сбрасываем стек навигации на главный экран
+            await Task.yield()
+            await MainActor.run {
+                path = NavigationPath()
+                dismissStage = 0
+            }
+
+        default:
+            await MainActor.run { dismissStage = 0 }
         }
     }
 }
