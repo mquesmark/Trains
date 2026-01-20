@@ -1,5 +1,8 @@
-
 import SwiftUI
+
+/// Этот экран намеренно реализован без ViewModel.
+/// Здесь нет загрузки данных или бизнес-логики: экран использует только локальные пользовательские настройки через "@AppStorage",
+/// поэтому дополнительный слой ViewModel был бы избыточным.
 
 struct SettingsView: View {
 
@@ -49,7 +52,7 @@ struct SettingsView: View {
                 Spacer()
                 Image(systemName: "chevron.right")
                     .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(Color(.label))
+                    .foregroundStyle(Color(.label))
             }
             .frame(height: 60)
             .padding(.horizontal, 16)

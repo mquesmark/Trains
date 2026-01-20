@@ -14,13 +14,13 @@ struct StoryView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text(story.title)
                         .font(.system(size: 34, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.white)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
 
                     Text(story.fullText)
                         .font(.system(size: 20, weight: .regular))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Color.white)
                         .lineLimit(3)
                         .multilineTextAlignment(.leading)
                 }

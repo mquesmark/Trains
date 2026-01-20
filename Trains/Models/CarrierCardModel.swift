@@ -1,25 +1,29 @@
 import Foundation
 
-struct CarrierCardModel: Identifiable {
+struct CarrierCardModel: Identifiable, Sendable {
     let id = UUID()
+    
+    let departureDate: Date
+    let arrivalDate: Date
     
     let date: String
     let startTime: String
     let endTime: String
     let routeTime: String
-    let logo: String
-    let name: String
     var warningText: String?
-    let hasTransfer: Bool
+    let transferCity: String?
     
-    init(date: String, startTime: String, endTime: String, routeTime: String, logo: String, name: String, warningText: String? = nil, hasTransfer: Bool = false) {
+    let carrierInfo: CarrierInfo
+    
+    init(departureDate: Date, arrivalDate: Date, date: String, startTime: String, endTime: String, routeTime: String, warningText: String? = nil, transferCity: String? = nil, carrierInfo: CarrierInfo) {
         self.date = date
+        self.departureDate = departureDate
+        self.arrivalDate = arrivalDate
         self.startTime = startTime
         self.endTime = endTime
         self.routeTime = routeTime
-        self.logo = logo
-        self.name = name
         self.warningText = warningText
-        self.hasTransfer = hasTransfer
+        self.transferCity = transferCity
+        self.carrierInfo = carrierInfo
     }
 }

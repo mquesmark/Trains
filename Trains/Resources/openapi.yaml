@@ -132,6 +132,24 @@ paths:
           required: false
           schema:
             type: string
+        - name: system
+          in: query
+          description: Система кодирования параметров to и from (yandex, iata, sirena, express, esr)
+          required: false
+          schema:
+            type: string
+        - name: show_systems
+          in: query
+          description: Система кодирования, коды которой следует добавить к описанию станций в ответе (yandex, esr)
+          required: false
+          schema:
+            type: string
+        - name: add_days_mask
+          in: query
+          description: Вернуть календарь хождения ниток (false/true)
+          required: false
+          schema:
+            type: boolean
         - name: offset
           in: query
           description: Смещение результатов
@@ -422,6 +440,9 @@ paths:
         "200":
           description: Успешный ответ
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllStationsResponse'
             text/html:
               schema:
                 $ref: '#/components/schemas/AllStationsResponse'
@@ -471,6 +492,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Segment'
+        search:
+          $ref: '#/components/schemas/Search'
         interval_segments:
           type: array
           description: Список интервальных рейсов, движение по которым идет регулярно, но без определенного расписания.
@@ -503,6 +526,37 @@ components:
                 description: Признак наличия пересадок по маршруту.
               tickets_info:
                 $ref: '#/components/schemas/TicketsInfo'
+              start_date:
+                type: string
+                description: Дата отправления рейса (YYYY-MM-DD)
+              departure_platform:
+                type: string
+                nullable: true
+                description: Номер платформы станции отправления (null если не указан)
+              arrival_platform:
+                type: string
+                description: Номер платформы станции прибытия (пустая строка если не указана)
+              departure_terminal:
+                type: string
+                nullable: true
+                description: Название терминала станции отправления (null если не указано)
+              arrival_terminal:
+                type: string
+                nullable: true
+                description: Название терминала станции прибытия (null если не указано)
+              stops:
+                type: string
+                description: Станции следования рейса, на которых совершается остановка (свободная форма)
+    Search:
+      type: object
+      properties:
+        date:
+          type: string
+          description: Дата, на которую получен список рейсов (YYYY-MM-DD)
+        from:
+          $ref: '#/components/schemas/Station'
+        to:
+          $ref: '#/components/schemas/Station'
     Copyright:
       type: object
       properties:
@@ -542,11 +596,9 @@ components:
           $ref: '#/components/schemas/Station'
         departure:
           type: string
-          format: date-time
           description: Время отправления
         arrival:
           type: string
-          format: date-time
           description: Время прибытия
         thread:
           $ref: '#/components/schemas/Thread'
@@ -555,6 +607,49 @@ components:
         duration:
           type: integer
           description: Длительность рейса в секундах
+        start_date:
+          type: string
+          description: Дата отправления рейса (YYYY-MM-DD)
+        has_transfers:
+          type: boolean
+          description: Признак наличия пересадок по ходу рейса
+        transfers:
+          type: array
+          nullable: true
+          description: Пункты пересадок (если рейс с пересадками)
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/Location'
+              - $ref: '#/components/schemas/Station'
+        details:
+          type: array
+          nullable: true
+          description: >
+            Детали маршрута с пересадками.
+            Содержит чередующиеся элементы JourneySegment (участки движения) и TransferStop (пересадки).
+            Используется только если has_transfers = true.
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/JourneySegment'
+              - $ref: '#/components/schemas/TransferStop'
+        departure_platform:
+          type: string
+          nullable: true
+          description: Номер платформы станции отправления (null если не указан)
+        arrival_platform:
+          type: string
+          description: Номер платформы станции прибытия (пустая строка если не указана)
+        departure_terminal:
+          type: string
+          nullable: true
+          description: Название терминала станции отправления (null если не указано)
+        arrival_terminal:
+          type: string
+          nullable: true
+          description: Название терминала станции прибытия (null если не указано)
+        stops:
+          type: string
+          description: Станции следования рейса, на которых совершается остановка (свободная форма)
     Pagination:
       type: object
       properties:
@@ -591,24 +686,6 @@ components:
         station_type:
           type: string
           description: Тип станции
-#          enum:
-#            - station
-#            - platform
-#            - stop
-#            - checkpoint
-#            - post
-#            - crossing
-#            - overtaking_point
-#            - train_station
-#            - airport
-#            - bus_station
-#            - bus_stop
-#            - unknown
-#            - port
-#            - port_point
-#            - wharf
-#            - river_port
-#            - marine_station
         station_type_name:
           type: string
           description: Название типа станции
@@ -650,11 +727,9 @@ components:
           description: Дни, когда рейс не выполняется
         arrival:
           type: string
-          format: date-time
           description: Время прибытия в формате ISO 8601
         departure:
           type: string
-          format: date-time
           description: Время отправления в формате ISO 8601
         thread:
           $ref: '#/components/schemas/Thread'
@@ -690,6 +765,14 @@ components:
           type: string
         interval:
           $ref: '#/components/schemas/Interval'
+        short_title:
+          type: string
+        transport_subtype:
+          $ref: '#/components/schemas/TransportSubtype'
+        express_type:
+          type: string
+        thread_method_link:
+          type: string
     Carrier:
       type: object
       properties:
@@ -714,6 +797,10 @@ components:
         logo:
           type: string
           description: Ссылка на логотип перевозчика
+        logo_svg:
+          type: string
+          nullable: true
+          description: Ссылка на логотип перевозчика в формате SVG
         email:
           type: string
           description: Электронная почта перевозчика
@@ -891,6 +978,8 @@ components:
     CarrierResponse:
       type: object
       properties:
+        carrier:
+          $ref: '#/components/schemas/Carrier'
         carriers:
           type: array
           items:
@@ -950,3 +1039,145 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Station'
+
+    # ===== Добавлено (минимально) из второго текста =====
+
+    # Алиасы, чтобы можно было использовать имена из другого файла, не меняя текущие ссылки
+    SearchResponse:
+      allOf:
+        - $ref: '#/components/schemas/Segments'
+
+    ThreadResponse:
+      allOf:
+        - $ref: '#/components/schemas/ThreadStationsResponse'
+
+    NearestSettlement:
+      allOf:
+        - $ref: '#/components/schemas/NearestCityResponse'
+
+    getStationsResponse:
+      allOf:
+        - $ref: '#/components/schemas/AllStationsResponse'
+
+    TransportSubtype:
+      type: object
+      properties:
+        color:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+
+    Location:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [settlement, station]
+        title:
+          type: string
+        short_title:
+          type: string
+        popular_title:
+          type: string
+        code:
+          type: string
+
+    SearchQuery:
+      type: object
+      properties:
+        from:
+          $ref: '#/components/schemas/Location'
+        to:
+          $ref: '#/components/schemas/Location'
+        date:
+          type: string
+
+    TransferPoint:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [settlement, station]
+          description: Тип пункта пересадки
+        title:
+          type: string
+          description: Название пункта пересадки
+        short_title:
+          type: string
+          description: Краткое название
+        popular_title:
+          type: string
+          description: Популярное название
+        code:
+          type: string
+          description: Код в системе Яндекс
+
+    JourneySegment:
+      type: object
+      description: Участок движения между двумя пунктами в маршруте с пересадками
+      properties:
+        thread:
+          $ref: '#/components/schemas/Thread'
+        from:
+          $ref: '#/components/schemas/Location'
+        to:
+          $ref: '#/components/schemas/Location'
+        departure:
+          type: string
+        arrival:
+          type: string
+        duration:
+          type: number
+        start_date:
+          type: string
+        departure_platform:
+          type: string
+          nullable: true
+        arrival_platform:
+          type: string
+          nullable: true
+        departure_terminal:
+          type: string
+          nullable: true
+        arrival_terminal:
+          type: string
+          nullable: true
+        stops:
+          type: string
+          nullable: true
+
+    TransferStop:
+      type: object
+      description: Точка пересадки между сегментами маршрута
+      required:
+        - is_transfer
+      properties:
+        is_transfer:
+          type: boolean
+          description: Всегда true
+          enum: [true]
+        duration:
+          type: number
+          description: Время пересадки в секундах
+        transfer_point:
+          $ref: '#/components/schemas/TransferPoint'
+          nullable: true
+          description: Пункт пересадки (город или станция)
+        transfer_from:
+          $ref: '#/components/schemas/Station'
+          nullable: true
+        transfer_to:
+          $ref: '#/components/schemas/Station'
+          nullable: true
+
+    TicketPlace:
+      type: object
+      properties:
+        price:
+          $ref: '#/components/schemas/Price'
+        name:
+          type: string
+        currency:
+          type: string

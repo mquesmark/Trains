@@ -1,28 +1,38 @@
 import SwiftUI
 
-enum TimeIntervals: CaseIterable {
-    case morning
-    case day
-    case evening
-    case night
-    
-    var title: String {
-        switch self {
-        case .morning: return "Утро 06:00 – 12:00"
-        case .day: return "День 12:00 – 18:00"
-        case .evening: return "Вечер 18:00 – 00:00"
-        case .night: return "Ночь 00:00 – 06:00"
-        }
-    }
-}
-
+/// Этот экран намеренно реализован без ViewModel.
+/// "FiltersView" редактирует состояние родительского экрана через @Binding (применение логики остаётся снаружи),
+/// поэтому отдельная ViewModel здесь привела бы к дублированию состояния и риску рассинхронизации.
 
 struct FiltersView: View {
 
+    // MARK: - Environment
+
     @Environment(\.dismiss) private var dismiss
 
+    // MARK: - Bindings
+
     @Binding var timeSelection: Set<TimeIntervals>
-    @Binding var showTransfers: Bool?
+    @Binding var showTransfers: Bool
+
+    // MARK: - Draft State
+
+    @State private var draftTimeSelection: Set<TimeIntervals>
+    @State private var draftShowTransfers: Bool
+
+    // MARK: - Init
+
+    init(
+        timeSelection: Binding<Set<TimeIntervals>>,
+        showTransfers: Binding<Bool>
+    ) {
+        self._timeSelection = timeSelection
+        self._showTransfers = showTransfers
+        self._draftTimeSelection = State(initialValue: timeSelection.wrappedValue)
+        self._draftShowTransfers = State(initialValue: showTransfers.wrappedValue)
+    }
+
+    // MARK: - Body
 
     var body: some View {
         ZStack {
@@ -31,21 +41,21 @@ struct FiltersView: View {
         }
     }
 
-    // MARK: - Content
+    // MARK: - Layout
 
     private var contentView: some View {
         VStack(alignment: .leading, spacing: 16) {
             timeTitleView
             timeListView
+
             transfersTitleView
             transfersListView
+
             Spacer()
             applyButton
         }
         .padding(16)
     }
-
-    // MARK: - Background
 
     private var backgroundView: some View {
         Color.backgroundYP
@@ -60,14 +70,13 @@ struct FiltersView: View {
     }
 
     private var timeListView: some View {
-        List(TimeIntervals.allCases, id: \.self) { interval in
-            timeRow(interval)
+        VStack(spacing: 0) {
+            ForEach(TimeIntervals.allCases, id: \.self) { interval in
+                timeRow(interval)
+            }
         }
-        .scrollDisabled(true)
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
         .background(Color.backgroundYP)
-        .frame(maxHeight: CGFloat(60 * TimeIntervals.allCases.count))
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func timeRow(_ interval: TimeIntervals) -> some View {
@@ -75,19 +84,21 @@ struct FiltersView: View {
             Text(interval.title)
             Spacer()
             Image(
-                systemName: timeSelection.contains(interval)
+                systemName: draftTimeSelection.contains(interval)
                 ? "checkmark.square.fill"
                 : "square"
             )
             .font(.system(size: 20, weight: .semibold))
         }
         .frame(height: 60)
-        .listRowBackground(Color.backgroundYP)
-        .listRowInsets(.init(.zero))
-        .listRowSeparator(.hidden)
+        .padding(.horizontal, 8)
         .contentShape(Rectangle())
         .onTapGesture {
-            toggleTimeSelection(interval)
+            if draftTimeSelection.contains(interval) {
+                draftTimeSelection.remove(interval)
+            } else {
+                draftTimeSelection.insert(interval)
+            }
         }
     }
 
@@ -99,20 +110,16 @@ struct FiltersView: View {
     }
 
     private var transfersListView: some View {
-        List {
-            transferRow(title: "Да", isSelected: showTransfers == true) {
-                showTransfers = true
+        VStack(spacing: 0) {
+            transferRow(title: "Да", isSelected: draftShowTransfers == true) {
+                draftShowTransfers = true
             }
-
-            transferRow(title: "Нет", isSelected: showTransfers == false) {
-                showTransfers = false
+            transferRow(title: "Нет", isSelected: draftShowTransfers == false) {
+                draftShowTransfers = false
             }
         }
-        .scrollDisabled(true)
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
         .background(Color.backgroundYP)
-        .frame(maxHeight: 120)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
     private func transferRow(
@@ -126,9 +133,7 @@ struct FiltersView: View {
             Image(isSelected ? .circleSelected : .circle)
         }
         .frame(height: 60)
-        .listRowBackground(Color.backgroundYP)
-        .listRowInsets(.init(.zero))
-        .listRowSeparator(.hidden)
+        .padding(.horizontal, 8)
         .contentShape(Rectangle())
         .onTapGesture(perform: action)
     }
@@ -153,16 +158,9 @@ struct FiltersView: View {
 
     // MARK: - Actions
 
-    private func toggleTimeSelection(_ interval: TimeIntervals) {
-        if timeSelection.contains(interval) {
-            timeSelection.remove(interval)
-        } else {
-            timeSelection.insert(interval)
-        }
-    }
-
     private func applyTapped() {
+        timeSelection = draftTimeSelection
+        showTransfers = draftShowTransfers
         dismiss()
     }
 }
-

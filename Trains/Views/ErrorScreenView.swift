@@ -1,5 +1,9 @@
 import SwiftUI
 
+/// Этот экран намеренно реализован без ViewModel.
+/// Он только отображает переданное состояние ошибки
+/// и не содержит бизнес-логики или управления данными.
+
 struct ErrorScreenView: View {
     
     let errorType: ErrorType
@@ -13,14 +17,22 @@ struct ErrorScreenView: View {
             
         }
     }
-    
+    var customText: String?
     var text: String {
-        switch errorType {
-        case .noInternet:
-            return "Нет интернета"
-        case .serverError:
-            return "Ошибка сервера"
+        if let customText {
+            return customText
+        } else {
+            switch errorType {
+            case .noInternet:
+                return "Нет интернета"
+            case .serverError:
+                return "Ошибка сервера"
+            }
         }
+    }
+    init(errorType: ErrorType, customText: String? = nil) {
+        self.errorType = errorType
+        self.customText = customText
     }
     
     var body: some View {
@@ -41,6 +53,6 @@ struct ErrorScreenView: View {
     ErrorScreenView(errorType: .noInternet)
 }
 #Preview {
-    ErrorScreenView(errorType: .noInternet)
+    ErrorScreenView(errorType: .noInternet, customText: "Test")
         .preferredColorScheme(.dark)
 }

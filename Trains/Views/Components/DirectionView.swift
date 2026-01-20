@@ -1,28 +1,33 @@
 import SwiftUI
 
+/// Этот компонент намеренно реализован без ViewModel.
+/// "DirectionView" — внутренняя UI-вью "MainScreen": она получает данные через "@Binding" и сообщает о действиях через колбэки,
+/// а состояние и логика сценария находятся в "MainScreenViewModel".
+
 struct DirectionView: View {
-    @Binding var fromCity: String?
-    @Binding var fromStation: String?
-    @Binding var toCity: String?
-    @Binding var toStation: String?
+    @Binding var fromCity: City?
+    @Binding var fromStation: Station?
+    @Binding var toCity: City?
+    @Binding var toStation: Station?
 
     var fromText: String? {
         guard let city = fromCity, let station = fromStation else {
             return nil
         }
-        return "\(city) (\(station))"
+        return "\(city.title) (\(station.title))"
     }
     var toText: String? {
         guard let city = toCity, let station = toStation else {
             return nil
         }
-        return "\(city) (\(station))"
+        return "\(city.title) (\(station.title))"
     }
 
     let fromPlaceholder = "Откуда"
     let toPlaceholder = "Куда"
     let onFromTap: () -> Void
     let onToTap: () -> Void
+    let onSwap: () -> Void
 
     var body: some View {
         ZStack {
@@ -55,7 +60,7 @@ struct DirectionView: View {
                 )
                 .padding(16)
                 Button {
-                    switchButtonTapped()
+                    onSwap()
                 } label: {
                     Image("change")
                 }
@@ -65,33 +70,4 @@ struct DirectionView: View {
         .frame(maxWidth: .infinity)
         .frame(height: 120)
     }
-
-    private func switchButtonTapped() {
-        swap(&fromCity, &toCity)
-        swap(&fromStation, &toStation)
-    }
-}
-
-#Preview {
-    struct PreviewWrapper: View {
-        @State private var fromCity: String? = "Москва"
-        @State private var fromStation: String? = "Ленинградский"
-        @State private var toCity: String? = "Санкт-Петербург"
-        @State private var toStation: String? = "Московский"
-
-        var body: some View {
-            DirectionView(
-                fromCity: $fromCity,
-                fromStation: $fromStation,
-                toCity: $toCity,
-                toStation: $toStation,
-                onFromTap: {},
-                onToTap: {}
-            )
-            .padding()
-            .background(Color(.systemGroupedBackground))
-        }
-    }
-
-    return PreviewWrapper()
 }
