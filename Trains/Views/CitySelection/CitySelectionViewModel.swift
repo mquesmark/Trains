@@ -11,7 +11,7 @@ final class CitySelectionViewModel: ObservableObject {
     @Published private(set) var cities: [City] = []
     @Published private(set) var filteredCities: [City] = []
     @Published private(set) var isLoading: Bool = false
-    @Published private(set) var errorText: String? = nil
+    @Published private(set) var errorText: String?
 
     init(stationsRepository: StationsRepository) {
         self.stationsRepository = stationsRepository

@@ -58,13 +58,13 @@ final class SearchService: SearchServiceProtocol, Sendable {
     func getScheduleBetweenStations(
         from: String,
         to: String,
-        format: String? = nil,
-        lang: String? = nil,
-        date: String? = nil,
-        transportTypes: String? = nil,
-        offset: Int? = nil,
-        limit: Int? = nil,
-        resultTimezone: String? = nil,
+        format: String?,
+        lang: String?,
+        date: String?,
+        transportTypes: String?,
+        offset: Int?,
+        limit: Int?,
+        resultTimezone: String?,
         transfers: Bool? = true
     ) async throws -> SearchSegments {
         let effectiveDate: String?
@@ -93,7 +93,7 @@ final class SearchService: SearchServiceProtocol, Sendable {
             return try ok.body.json
 
         case let .undocumented(statusCode, payload):
-            var bodyText: String? = nil
+            var bodyText: String?
 
             if let body = payload.body {
                 do {

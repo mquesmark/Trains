@@ -17,7 +17,7 @@ struct StoriesView: View {
     init(
         stories: [Story] = Mocks.stories,
         startIndex: Int = 0,
-        onStoryShown: (@MainActor @Sendable (UUID) -> Void)? = nil
+        onStoryShown: (@MainActor @Sendable (UUID) -> Void)?
     ) {
         self.stories = stories
         self.onStoryShown = onStoryShown

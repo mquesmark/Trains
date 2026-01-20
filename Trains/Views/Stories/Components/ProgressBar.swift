@@ -14,7 +14,7 @@ struct ProgressBar: View {
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: .progressBarCornerRadius)
                     .frame(width: geometry.size.width, height: .progressBarHeight)
-                    .foregroundColor(.white)
+                    .foregroundStyle(Color.white)
 
                 RoundedRectangle(cornerRadius: .progressBarCornerRadius)
                     .frame(
@@ -24,7 +24,7 @@ struct ProgressBar: View {
                         ),
                         height: .progressBarHeight
                     )
-                    .foregroundColor(.blueUniversal)
+                    .foregroundStyle(Color.blueUniversal)
             }
             .mask {
                 MaskView(numberOfSections: numberOfSections)
@@ -50,7 +50,7 @@ private struct MaskFragmentView: View {
         RoundedRectangle(cornerRadius: .progressBarCornerRadius)
             .fixedSize(horizontal: false, vertical: true)
             .frame(height: .progressBarHeight)
-            .foregroundStyle(.white)
+            .foregroundStyle(Color.white)
     }
 }
 

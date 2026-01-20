@@ -119,8 +119,8 @@ final class StoriesViewModel: ObservableObject {
     }
 
     private func reportShownIfNeeded() {
-        guard let id = currentStory?.id else { return }
-        guard !shownIDs.contains(id) else { return }
+        guard let id = currentStory?.id,
+              !shownIDs.contains(id) else { return }
         shownIDs.insert(id)
         onStoryShown?(id)
     }

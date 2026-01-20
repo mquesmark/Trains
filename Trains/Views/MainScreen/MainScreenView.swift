@@ -164,7 +164,7 @@ struct MainScreenView: View {
             Text("Найти")
                 .frame(width: 150, height: 60)
                 .font(.system(size: 17, weight: .bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Color.white)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.blueUniversal)

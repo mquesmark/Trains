@@ -15,7 +15,7 @@ struct CarrierCardView: View {
         }
         .padding(14)
         .background(cardBackground)
-        .foregroundStyle(.blackUniversal)
+        .foregroundStyle(Color.blackUniversal)
     }
 
     // MARK: - Header

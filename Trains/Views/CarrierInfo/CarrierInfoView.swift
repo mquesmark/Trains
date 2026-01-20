@@ -48,7 +48,7 @@ struct CarrierInfoView: View {
 
                     Text(displayOrPlaceholder(viewModel.carrierInfo.email))
                         .font(.system(size: 12, weight: .regular))
-                        .foregroundColor(.blueUniversal)
+                        .foregroundStyle(Color.blueUniversal)
                 }
                 .frame(height: 60)
 
@@ -58,7 +58,7 @@ struct CarrierInfoView: View {
 
                     Text(displayOrPlaceholder(viewModel.carrierInfo.phone))
                         .font(.system(size: 12, weight: .regular))
-                        .foregroundColor(.blueUniversal)
+                        .foregroundStyle(Color.blueUniversal)
                 }
                 .frame(height: 60)
 

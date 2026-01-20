@@ -13,7 +13,7 @@ final class StationSelectionViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var stations: [Station] = []
     @Published private(set) var filteredStations: [Station] = []
-    @Published private(set) var errorText: String? = nil
+    @Published private(set) var errorText: String?
     
     init(city: City, stationsRepository: StationsRepository) {
         self.city = city

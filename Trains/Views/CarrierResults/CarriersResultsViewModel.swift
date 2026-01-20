@@ -12,7 +12,7 @@ final class CarriersResultsViewModel: ObservableObject {
     @Published private(set) var carriers: [CarrierCardModel] = []
 
     @Published private(set) var isLoading: Bool = false
-    @Published private(set) var errorText: String? = nil
+    @Published private(set) var errorText: String?
 
     init(client: SearchClient) {
         self.client = client
@@ -21,10 +21,9 @@ final class CarriersResultsViewModel: ObservableObject {
     var filteredCarriers: [CarrierCardModel] {
         var result = carriers
 
-            if showTransfers == false {
-                result = result.filter { $0.warningText == nil }
-            }
-        
+        if !showTransfers {
+            result = result.filter { $0.warningText == nil }
+        }
 
         // Фильтр по времени (если выбран)
         if !timeSelection.isEmpty {
@@ -34,12 +33,12 @@ final class CarriersResultsViewModel: ObservableObject {
                 return timeSelection.contains { $0.range.contains(hour) }
             }
         }
-        
-        result.sort { // Сортируем результаты по возрастанию даты
+
+        result.sort {  // Сортируем результаты по возрастанию даты
             if $0.departureDate != $1.departureDate {
                 return $0.departureDate < $1.departureDate
             }
-            return $0.arrivalDate < $1.arrivalDate // на случай, если время отправления одинаковое
+            return $0.arrivalDate < $1.arrivalDate  // на случай, если время отправления одинаковое
         }
         return result
     }
@@ -60,7 +59,8 @@ final class CarriersResultsViewModel: ObservableObject {
         defer { isLoading = false }
         do {
             let shouldIncludeTransfers = transfers ?? true
-            let effectiveDate: String? = shouldIncludeTransfers ? DateTimeHelpers.todayYyyyMmDd() : nil
+            let effectiveDate: String? =
+                shouldIncludeTransfers ? DateTimeHelpers.todayYyyyMmDd() : nil
 
             let request = try await client.search(
                 fromCode: fromCode,
@@ -76,33 +76,55 @@ final class CarriersResultsViewModel: ObservableObject {
             cards.reserveCapacity(segments.count)
 
             for segment in segments {
-                let baseDate = (segment.start_date?.isEmpty == false ? segment.start_date : nil)
-                ?? effectiveDate
+                let baseDate =
+                    (segment.start_date?.isEmpty == false
+                        ? segment.start_date : nil)
+                    ?? effectiveDate
 
-                let departureDate = DateTimeHelpers.parse(segment.departure, baseDateYyyyMmDd: baseDate)
+                let departureDate = DateTimeHelpers.parse(
+                    segment.departure,
+                    baseDateYyyyMmDd: baseDate
+                )
 
-                let arrivalDateRaw = DateTimeHelpers.parse(segment.arrival, baseDateYyyyMmDd: baseDate)
+                let arrivalDateRaw = DateTimeHelpers.parse(
+                    segment.arrival,
+                    baseDateYyyyMmDd: baseDate
+                )
                 let arrivalDate: Date? = {
-                    guard let dep = departureDate, let arr = arrivalDateRaw else { return arrivalDateRaw }
+                    guard let dep = departureDate, let arr = arrivalDateRaw
+                    else { return arrivalDateRaw }
                     if arr < dep {
-                        return Calendar.current.date(byAdding: .day, value: 1, to: arr)
+                        return Calendar.current.date(
+                            byAdding: .day,
+                            value: 1,
+                            to: arr
+                        )
                     }
                     return arr
                 }()
 
                 guard let departureDate, let arrivalDate else {
-                    print("PARSE FAIL departure:", segment.departure ?? "nil", "arrival:", segment.arrival ?? "nil")
+                    print(
+                        "PARSE FAIL departure:",
+                        segment.departure ?? "nil",
+                        "arrival:",
+                        segment.arrival ?? "nil"
+                    )
                     continue
                 }
-                
+
                 let dateText: String = {
                     if let startDate = segment.start_date, !startDate.isEmpty {
-                        return DateTimeHelpers.prettyDateText(fromYyyyMMdd: startDate)
+                        return DateTimeHelpers.prettyDateText(
+                            fromYyyyMMdd: startDate
+                        )
                     }
                     return DateTimeHelpers.prettyDateText(from: departureDate)
                 }()
 
-                let startTimeText = DateTimeHelpers.timeText(from: departureDate)
+                let startTimeText = DateTimeHelpers.timeText(
+                    from: departureDate
+                )
 
                 let endTimeText = DateTimeHelpers.timeText(from: arrivalDate)
 
@@ -113,12 +135,16 @@ final class CarriersResultsViewModel: ObservableObject {
                     }
 
                     // 2) Fallback: считаем по разнице дат
-                    return max(0, Int(arrivalDate.timeIntervalSince(departureDate)))
+                    return max(
+                        0,
+                        Int(arrivalDate.timeIntervalSince(departureDate))
+                    )
                 }()
 
                 let hours = durationSeconds / 3600
                 let minutes = (durationSeconds % 3600) / 60
-                let routeTimeText = hours > 0
+                let routeTimeText =
+                    hours > 0
                     ? "\(hours)ч \(minutes)м"
                     : "\(minutes)м"
 
@@ -129,12 +155,14 @@ final class CarriersResultsViewModel: ObservableObject {
                 let warningText: String? = {
                     guard segment.has_transfers == true else { return nil }
                     if let city = transferCity, !city.isEmpty {
-                        let cleaned = city
+                        let cleaned =
+                            city
                             .replacingOccurrences(of: " вокзал", with: "")
                             .replacingOccurrences(of: " станция", with: "")
                             .replacingOccurrences(of: " ст.", with: "")
                             .trimmingCharacters(in: .whitespacesAndNewlines)
-                        return cleaned.isEmpty ? "С пересадкой" : "С пересадкой в \(cleaned)"
+                        return cleaned.isEmpty
+                            ? "С пересадкой" : "С пересадкой в \(cleaned)"
                     }
                     return "С пересадкой"
                 }()
@@ -158,11 +186,13 @@ final class CarriersResultsViewModel: ObservableObject {
             // Приводим "сырой" 404 от OpenAPI к понятному сообщению.
             if let httpError = error as? APIHTTPError {
                 switch httpError {
-                case let .undocumented(statusCode, body):
+                case .undocumented(let statusCode, let body):
                     if statusCode == 404,
-                       let body,
-                       body.contains("Не нашли объект по yandex коду") {
-                        self.errorText = "Яндекс.Расписания не нашли выбранную станцию. Выберите другую."
+                        let body,
+                        body.contains("Не нашли объект по yandex коду")
+                    {
+                        self.errorText =
+                            "Яндекс.Расписания не нашли выбранную станцию. Выберите другую."
                     } else {
                         self.errorText = httpError.localizedDescription
                     }
@@ -177,7 +207,9 @@ final class CarriersResultsViewModel: ObservableObject {
 
     // MARK: - Transfers helpers
 
-    private func extractCarrierPresentation(from segment: Components.Schemas.Segment) -> CarrierInfo {
+    private func extractCarrierPresentation(
+        from segment: Components.Schemas.Segment
+    ) -> CarrierInfo {
         // Прямой маршрут
         if segment.has_transfers != true {
             let carrier = segment.thread?.carrier
@@ -186,7 +218,13 @@ final class CarriersResultsViewModel: ObservableObject {
             let logo = carrier?.logo ?? carrier?.logo_svg ?? ""
             let email = carrier?.email ?? ""
             let phone = carrier?.phone ?? ""
-            return CarrierInfo(code: code, logoUrlString: logo, name: name, email: email, phone: phone)
+            return CarrierInfo(
+                code: code,
+                logoUrlString: logo,
+                name: name,
+                email: email,
+                phone: phone
+            )
         }
 
         // Маршрут с пересадками: берём перевозчика первого JourneySegment, если получится
@@ -199,24 +237,40 @@ final class CarriersResultsViewModel: ObservableObject {
                     let logo = carrier?.logo ?? carrier?.logo_svg ?? ""
                     let email = carrier?.email ?? ""
                     let phone = carrier?.phone ?? ""
-                    return CarrierInfo(code: code, logoUrlString: logo, name: name, email: email, phone: phone)
+                    return CarrierInfo(
+                        code: code,
+                        logoUrlString: logo,
+                        name: name,
+                        email: email,
+                        phone: phone
+                    )
                 }
             }
         }
 
-        return CarrierInfo(code: nil, logoUrlString: "", name: "Несколько перевозчиков", email: "", phone: "")
+        return CarrierInfo(
+            code: nil,
+            logoUrlString: "",
+            name: "Несколько перевозчиков",
+            email: "",
+            phone: ""
+        )
     }
 
-    private func extractTransferCity(from segment: Components.Schemas.Segment) -> String? {
+    private func extractTransferCity(from segment: Components.Schemas.Segment)
+        -> String?
+    {
         guard segment.has_transfers == true else { return nil }
 
         // 1) Приоритет: поле `transfers`
         if let transfers = segment.transfers, let first = transfers.first {
             switch first {
             case .Location(let location):
-                return location.popular_title ?? location.title ?? location.short_title
+                return location.popular_title ?? location.title
+                    ?? location.short_title
             case .Station(let station):
-                return station.popular_title ?? station.title ?? station.short_title
+                return station.popular_title ?? station.title
+                    ?? station.short_title
             }
         }
 
@@ -225,7 +279,8 @@ final class CarriersResultsViewModel: ObservableObject {
             for detail in details {
                 if case .TransferStop(let transferStop) = detail {
                     if let point = transferStop.transfer_point {
-                        return point.popular_title ?? point.title ?? point.short_title
+                        return point.popular_title ?? point.title
+                            ?? point.short_title
                     }
                 }
             }
@@ -235,8 +290,8 @@ final class CarriersResultsViewModel: ObservableObject {
     }
 }
 
-private extension DateTimeHelpers {
-    static func todayYyyyMmDd() -> String {
+extension DateTimeHelpers {
+    fileprivate static func todayYyyyMmDd() -> String {
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")

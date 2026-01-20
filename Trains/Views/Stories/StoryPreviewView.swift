@@ -21,7 +21,7 @@ struct StoryPreviewView: View {
     private var titleText: some View {
         Text(model.previewTitle)
             .font(.system(size: 12, weight: .regular))
-            .foregroundStyle(.white)
+            .foregroundStyle(Color.white)
             .opacity(model.isWatched ? 0.5 : 1)
             .lineLimit(3)
             .padding(.horizontal, 8)

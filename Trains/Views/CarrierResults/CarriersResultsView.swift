@@ -8,7 +8,7 @@ struct CarriersResultsView: View {
     let toCity: City
 
     var routeString: String {
-            return "\(fromCity.title) (\(fromStation.title)) → \(toCity.title) (\(toStation.title))"
+        "\(fromCity.title) (\(fromStation.title)) → \(toCity.title) (\(toStation.title))"
     }
 
     @StateObject private var viewModel = CarriersResultsViewModel(
@@ -26,7 +26,10 @@ struct CarriersResultsView: View {
                     ProgressView("Загрузка вариантов...")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let errorText = viewModel.errorText {
-                    ErrorScreenView(errorType: .serverError, customText: errorText)
+                    ErrorScreenView(
+                        errorType: .serverError,
+                        customText: errorText
+                    )
                 } else if viewModel.filteredCarriers.isEmpty {
                     Text("Вариантов нет")
                         .font(.system(size: 24, weight: .bold))
@@ -35,7 +38,9 @@ struct CarriersResultsView: View {
                     List {
                         ForEach(viewModel.filteredCarriers) { carrier in
                             Button {
-                                path.append(Route.carrierInfo(carrier.carrierInfo))
+                                path.append(
+                                    Route.carrierInfo(carrier.carrierInfo)
+                                )
                             } label: {
                                 CarrierCardView(carrier: carrier)
                                     .contentShape(Rectangle())
@@ -60,8 +65,12 @@ struct CarriersResultsView: View {
                 }
             }
 
-            let isDefaultFilters = viewModel.timeSelection.isEmpty && ((viewModel.showTransfers) == true)
-            let shouldShowFiltersButton = !viewModel.isLoading && viewModel.errorText == nil && (!viewModel.filteredCarriers.isEmpty || !isDefaultFilters)
+            let isDefaultFilters =
+                viewModel.timeSelection.isEmpty
+                && ((viewModel.showTransfers) == true)
+            let shouldShowFiltersButton =
+                !viewModel.isLoading && viewModel.errorText == nil
+                && (!viewModel.filteredCarriers.isEmpty || !isDefaultFilters)
 
             if shouldShowFiltersButton {
                 NavigationLink {
@@ -106,7 +115,10 @@ struct CarriersResultsView: View {
                 .padding(.bottom, 24)
             }
         }
-        .task(id: "\(fromStation.id)|\(toStation.id)|\((viewModel.showTransfers) ? 1 : 0)") {
+        .task(
+            id:
+                "\(fromStation.id)|\(toStation.id)|\((viewModel.showTransfers) ? 1 : 0)"
+        ) {
             await viewModel.search(
                 fromCode: fromStation.id,
                 toCode: toStation.id,
@@ -120,7 +132,9 @@ struct CarriersResultsView: View {
                 .gesture(
                     DragGesture(minimumDistance: 20, coordinateSpace: .local)
                         .onEnded { value in
-                            if value.translation.width > 80 && abs(value.translation.height) < 40 {
+                            if value.translation.width > 80
+                                && abs(value.translation.height) < 40
+                            {
                                 if !path.isEmpty {
                                     path.removeLast()
                                 }

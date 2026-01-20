@@ -19,7 +19,7 @@ struct ErrorScreenView: View {
     }
     var customText: String?
     var text: String {
-        if let customText = customText {
+        if let customText {
             return customText
         } else {
             switch errorType {

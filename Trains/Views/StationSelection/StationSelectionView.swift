@@ -61,7 +61,7 @@ struct StationSelectionView: View {
                         Spacer()
                         Image(systemName: "chevron.right")
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(Color(.label))
+                            .foregroundStyle(Color(.label))
                     }
                     .frame(height: 60)
                     .contentShape(Rectangle())
