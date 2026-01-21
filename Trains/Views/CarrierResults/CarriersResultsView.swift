@@ -23,8 +23,8 @@ struct CarriersResultsView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                 if viewModel.isLoading {
-                    ProgressView("Загрузка вариантов...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    CarrierLoadingSkeletonView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 } else if let errorText = viewModel.errorText {
                     ErrorScreenView(
                         errorType: .serverError,
@@ -141,6 +141,64 @@ struct CarriersResultsView: View {
                             }
                         }
                 )
+        }
+    }
+
+    // MARK: - Skeleton Loading Views
+
+    private struct CarrierLoadingSkeletonView: View {
+        private let itemsCount: Int = 6
+
+        var body: some View {
+            VStack(spacing: 0) {
+                ForEach(0..<itemsCount, id: \.self) { _ in
+                    CarrierSkeletonCardView()
+                }
+
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity)
+            .background(Color.backgroundYP)
+            .accessibilityHidden(true)
+        }
+    }
+
+    private struct CarrierSkeletonCardView: View {
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(.tertiarySystemFill))
+                    .frame(width: 220, height: 16)
+
+                HStack(spacing: 12) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 70, height: 16)
+
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 90, height: 16)
+
+                    Spacer()
+
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 60, height: 16)
+                }
+
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(.tertiarySystemFill))
+                    .frame(width: 150, height: 16)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(.secondarySystemBackground))
+            )
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
+            .shimmer()
         }
     }
 
