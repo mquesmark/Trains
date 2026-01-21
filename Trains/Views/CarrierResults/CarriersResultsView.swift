@@ -166,29 +166,56 @@ struct CarriersResultsView: View {
     private struct CarrierSkeletonCardView: View {
         var body: some View {
             VStack(alignment: .leading, spacing: 12) {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color(.tertiarySystemFill))
-                    .frame(width: 220, height: 16)
+                // Header: logo + title + date
+                HStack(alignment: .top, spacing: 12) {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 48, height: 48)
 
-                HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(Color(.tertiarySystemFill))
+                            .frame(width: 210, height: 16)
+
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(Color(.tertiarySystemFill))
+                            .frame(width: 140, height: 14)
+                    }
+
+                    Spacer(minLength: 0)
+
                     RoundedRectangle(cornerRadius: 6)
                         .fill(Color(.tertiarySystemFill))
-                        .frame(width: 70, height: 16)
-
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color(.tertiarySystemFill))
-                        .frame(width: 90, height: 16)
-
-                    Spacer()
-
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color(.tertiarySystemFill))
-                        .frame(width: 60, height: 16)
+                        .frame(width: 74, height: 14)
                 }
 
+                // Optional label under title (e.g. "С пересадкой")
                 RoundedRectangle(cornerRadius: 6)
                     .fill(Color(.tertiarySystemFill))
-                    .frame(width: 150, height: 16)
+                    .frame(width: 110, height: 14)
+
+                // Time row: departure — duration — arrival
+                HStack(alignment: .center, spacing: 12) {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 56, height: 18)
+
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(height: 2)
+
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 64, height: 16)
+
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(height: 2)
+
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color(.tertiarySystemFill))
+                        .frame(width: 56, height: 18)
+                }
             }
             .padding(16)
             .frame(maxWidth: .infinity)
