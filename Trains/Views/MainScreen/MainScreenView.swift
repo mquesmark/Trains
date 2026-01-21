@@ -33,6 +33,10 @@ struct MainScreenView: View {
                 .navigationDestination(for: Route.self) { route in
                     destination(for: route)
                 }
+        } .task(priority: .high) {
+            do {
+                try await stationsRepository.loadInfoIfNeeded()
+            } catch { }
         }
     }
 

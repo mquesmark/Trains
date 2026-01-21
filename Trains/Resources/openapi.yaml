@@ -685,9 +685,11 @@ components:
           description: Долгота станции
         station_type:
           type: string
+          nullable: true
           description: Тип станции
         station_type_name:
           type: string
+          nullable: true
           description: Название типа станции
         transport_type:
           type: string

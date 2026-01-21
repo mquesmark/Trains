@@ -56,8 +56,17 @@ struct StationSelectionView: View {
             } else {
                 List(viewModel.filteredStations) { station in
                     HStack {
-                        Text(station.title)
-                            .font(.system(size: 17, weight: .regular))
+                        HStack(spacing: 8) {
+                            Text(station.title)
+                                .font(.system(size: 17, weight: .regular))
+                                .lineLimit(1)
+
+                            if let symbolName = station.stationType.symbolName {
+                                Image(systemName: symbolName)
+                                    .font(.system(size: 13, weight: .regular))
+                                    .foregroundStyle(.primary)
+                            }
+                        }
                         Spacer()
                         Image(systemName: "chevron.right")
                             .font(.system(size: 20, weight: .semibold))
