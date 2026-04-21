@@ -33,6 +33,17 @@ Trains is an iOS app for searching train routes and viewing carrier information.
 
 3. Run the app in Xcode.
 
+## Screenshots
+
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/4409879b-ba71-4e8c-823c-1ca971d058a5" width="125" />
+  <img src="https://github.com/user-attachments/assets/66fe13b5-0f64-4d9e-a194-f8bed5b1cf6f" width="125" />
+  <img src="https://github.com/user-attachments/assets/b9b80d94-076c-4253-a214-346c33799736" width="125" />
+  <img src="https://github.com/user-attachments/assets/0e79d55b-73b0-488c-b422-582b3ac63465" width="125" />
+  <img src="https://github.com/user-attachments/assets/00a366e0-4880-4c04-bc81-d4f8552e2cd6" width="125" />
+  <img src="https://github.com/user-attachments/assets/95bbcf12-03ad-4c88-9cca-f1a2f1b2b124" width="125" />
+</p>
+
 ## Architecture
 
 The project is divided into several feature modules:
