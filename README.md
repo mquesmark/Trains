@@ -14,6 +14,7 @@ Trains is an iOS app for searching train routes and viewing carrier information.
 - Settings screen
 - Stories interface
 - Loading placeholders and shimmer effects
+- Supports iOS 17+
 
 ## Tech Stack
 
